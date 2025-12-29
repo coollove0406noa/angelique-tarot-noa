@@ -1060,7 +1060,7 @@ function renderCard(card, isReversed, positionLabel){
 }
 function cardImageUrl(image){
   let raw = (image ?? "").toString().trim();
-  if(!raw) return "public/cards/back.png";
+  if(!raw) return "public/cards/back.webp"; // ← backもwebpにしたなら
 
   raw = raw
     .replace(/^\uFEFF/, "")
@@ -1069,10 +1069,19 @@ function cardImageUrl(image){
     .replace(/^\/+/, "")
     .replace(/\\/g, "/");
 
-  // 拡張子が無いなら .png を付ける（超重要）
+  // 拡張子が無いなら .webp を付ける（←ここが重要）
   if(!/\.(png|jpg|jpeg|webp)$/i.test(raw)){
-    raw += ".png";
+    raw += ".webp";
   }
+
+  if(/^https?:\/\//i.test(raw)) return raw;
+
+  if(raw.startsWith("public/")) return encodeURI(raw);
+  if(raw.startsWith("cards/"))  return encodeURI("public/" + raw);
+
+  return encodeURI("public/cards/" + raw);
+}
+
 
   // フルURLはそのまま
   if(/^https?:\/\//i.test(raw)) return raw;
@@ -1099,3 +1108,4 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
