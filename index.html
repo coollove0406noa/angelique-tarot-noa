@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Angelique Tarot (CSV版)</title>
+  <style>
+    :root{
+  --bg:#666132;
+  --text:#ffffff;                 /* 文字は白系に */
+  --muted:rgba(231, 206, 233, 0.72);  /* 補助文字 */
+  --line:rgba(133, 45, 45, 0.14);
+
+  --accent:#f0abfc;   /* 天使ピンク */
+  --accent2:#a5b4fc;  /* ラベンダー */
+
+  --good:#86efac;
+  --warn:#fde68a;
+  --bad:#fda4af;
+}
+
+
+    *{box-sizing:border-box}
+   body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+
+  background:
+    /* 光のヴェール */
+    radial-gradient(1200px 700px at 50% -10%, rgba(240,171,252,.25), transparent 60%),
+    radial-gradient(900px 600px at 80% 10%, rgba(165,180,252,.18), transparent 55%),
+
+    /* ★ 背景画像 */
+    url("public/bg/angel_bg1.jpg") center / cover no-repeat,
+
+    /* ベース色（画像が読めない時の保険） */
+    var(--bg);
+
+  color: var(--text);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:18px;
+}
+
+
+
+    .app{width:min(1100px, 100%)}
+    header{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; margin-bottom:14px;}
+    .title{display:flex; flex-direction:column; gap:4px;}
+    .title h1{margin:0; font-size:30px; letter-spacing:.04em;}
+    .title p{margin:0; color:var(--muted); font-size:22px; line-height:1.4;}
+
+    .panel{
+  background: rgba(20, 16, 30, .62);   /* 半透明の闇 */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:18px;
+  padding:14px;
+
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.45),
+    inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+
+    .topGrid{display:grid; grid-template-columns: 1.2fr .8fr; gap:12px;}
+    @media (max-width: 980px){
+  .cardsGrid{ grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 980px){
+  .cardsGrid{ grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 520px){
+  .cardsGrid{ grid-template-columns: repeat(3, 1fr); gap:10px; }
+  .cardImg{ width: 160px; }
+}
+
+
+.drawMode{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  padding:10px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  user-select:none;
+  transition:transform .12s ease, background .12s ease;
+}
+.chip:hover{transform:translateY(-1px); background:rgba(255,255,255,.08)}
+.chip input{accent-color:var(--accent); margin:0}
+.chip strong{font-size:13px}
+.chip span{font-size:12px; color:var(--muted)}
+
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;}
+    button{
+      border:0; cursor:pointer;
+      padding:12px 14px; border-radius:14px;
+      color:var(--text);
+      background: linear-gradient(135deg, rgba(167,139,250,.9), rgba(96,165,250,.9));
+      font-weight:700;
+      letter-spacing:.02em;
+      box-shadow: 0 10px 25px rgba(96,165,250,.14);
+      transition:transform .12s ease, filter .12s ease;
+    }
+    button:hover{transform:translateY(-1px); filter:saturate(1.05)}
+    button.secondary{
+       background: linear-gradient(
+    135deg,
+    rgba(240,171,252,.95),
+    rgba(165,180,252,.95)
+  );
+  box-shadow:
+    0 10px 30px rgba(165,180,252,.25),
+    inset 0 0 0 1px rgba(255,255,255,.25);
+}
+    button.secondary:hover{color:var(--text); background:rgba(255,255,255,.09)}
+    .status{margin-top:10px; color:var(--muted); font-size:12px;}
+
+    .stage{margin-top:12px; padding:14px;}
+    .stageTop{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+    .stageTitle{display:flex; flex-direction:column; gap:2px;}
+    .stageTitle h2{margin:0; font-size:16px;}
+    .stageTitle p{margin:0; font-size:12px; color:var(--muted);}
+
+    .shuffleArea{
+      position:relative; height:140px; border-radius:16px;
+      background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.15));
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .deck{
+  position:absolute; left:50%; top:50%;
+  width:92px; height:130px;
+  transform:translate(-50%,-50%);
+  border-radius:16px;
+  overflow:hidden;
+
+  /* ★裏面画像を表示 */
+  background: url("public/cards/back.png") center / cover no-repeat;
+
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow: 0 18px 40px rgba(0,0,0,.45);
+}
+
+/* 文字ロゴは消したいならこのまま削除してOK */
+.deck::after{
+  content:"";
+}
+
+/* 飛ぶカード（裏面） */
+.fly{
+  position:absolute; width:86px; height:122px;
+  border-radius:16px;
+  overflow:hidden;
+
+  /* ★裏面画像を表示 */
+  background: url("public/cards/back.png") center / cover no-repeat;
+
+  border:1px solid rgba(255,255,255,.15);
+  left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  box-shadow: 0 16px 30px rgba(0,0,0,.35);
+}
+
+    .shuffling .deck{animation: deckPulse .65s ease-in-out infinite;}
+    .shuffling .fly{opacity:1; animation: fly 1.05s ease-in-out infinite;}
+    .shuffling .fly:nth-child(2){animation-delay:.08s}
+    .shuffling .fly:nth-child(3){animation-delay:.16s}
+    .shuffling .fly:nth-child(4){animation-delay:.24s}
+    .shuffling .fly:nth-child(5){animation-delay:.32s}
+    .shuffling .fly:nth-child(6){animation-delay:.40s}
+    @keyframes deckPulse{0%,100%{transform:translate(-50%,-50%) rotate(0deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(2deg) scale(1.02)}}
+    @keyframes fly{
+      0%{transform:translate(-50%,-50%) rotate(-6deg) translateX(0) translateY(0) scale(1); opacity:0}
+      18%{opacity:.9}
+      50%{transform:translate(-50%,-50%) rotate(14deg) translateX(210px) translateY(-30px) scale(.98); opacity:.55}
+      82%{opacity:.05}
+      100%{transform:translate(-50%,-50%) rotate(22deg) translateX(-220px) translateY(40px) scale(.96); opacity:0}
+    }
+
+    .cardsGrid{margin-top:14px; display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;}
+  .cardsGrid.single{
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.cardsGrid.three{
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;                 /* 余白少なめ */
+  align-items: start;
+  justify-items: center;
+}
+
+/* 真ん中だけ少し強調（好みで） */
+.cardsGrid.three .tcard:nth-child(2) .cardImg{
+  width: min(380px, 28vw);
+}
+
+@media (max-width: 520px){
+  .cardImg{ width: 170px; }
+  .cardsGrid.three .tcard:nth-child(2) .cardImg{ width: 200px; }
+}
+/* === 文字の可読性を上げる魔法 === */
+body,
+.panel,
+.tcard,
+.stage,
+header,
+.status,
+.small,
+.empty{
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.55),
+    0 0 6px rgba(0,0,0,.35);
+}
+
+    .tcard{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:
+    0 12px 34px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,255,255,.12),
+    0 0 28px rgba(240,171,252,.15); /* 光 */
+}
+    .tcardHeader{
+      display:flex; justify-content:space-between; gap:10px;
+      padding:12px 12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+    }
+    .tcardTitle{display:flex; flex-direction:column; gap:3px;}
+    .tcardTitle .pos{font-size:12px; color:rgba(255,255,255,.78); letter-spacing:.06em;}
+    .tcardTitle .name{font-size:14px; font-weight:800; line-height:1.2;}
+    .tcardTitle .sub{font-size:12px; color:var(--muted); font-weight:600;}
+
+    .badge{
+      align-self:flex-start;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.15);
+      background: rgba(255,255,255,.06);
+      color:rgba(255,255,255,.85);
+      white-space:nowrap;
+    }
+    .badge.up{border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.12)}
+    .badge.rev{border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.12)}
+
+    .tcardVisual{padding:12px; display:flex; justify-content:center;}
+    /* 結果カード（tcard）内の画像 */
+    /* 結果カード（tcard）内の画像 */
+    /* === ②-1 結果カード画像を大きく === */
+/* ===== cardImg はここで一括管理（最後に置く） ===== */
+.cardImg{
+  width: 380px;              /* 3枚すべて大きく */
+  max-width: 92%;
+  height: auto;
+  display:block;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow: 0 22px 46px rgba(0,0,0,.45);
+}
+.cardImg.reversed{ transform: rotate(180deg); }
+
+/* 3枚引きレイアウト */
+.cardsGrid.three{
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  justify-items: center;
+  align-items: start;
+}
+
+/* 真ん中だけ“さらに”強調（任意。要らなければ消してOK） */
+.cardsGrid.three .tcard:nth-child(2) .cardImg{
+  width: 360px;
+}
+
+/* 1枚引き */
+.cardsGrid.single{
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+/* スマホ調整 */
+@media (max-width: 520px){
+  .cardsGrid.three{ gap: 10px; }
+  .cardImg{ width: 30vw; } /* 3枚横で収まる */
+  .cardsGrid.three .tcard:nth-child(2) .cardImg{ width: 34vw; }
+}
+
+
+
+    .face{
+      width:128px; height:188px;
+      border-radius:18px;
+      background:
+        radial-gradient(120px 90px at 30% 20%, rgba(167,139,250,.30), transparent 60%),
+        radial-gradient(140px 110px at 70% 80%, rgba(96,165,250,.22), transparent 65%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: 0 16px 30px rgba(0,0,0,.40);
+      display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden;
+      transition: transform .2s ease;
+    }
+    .face .mono{position:absolute; top:10px; left:10px; font-size:11px; color:rgba(255,255,255,.7); letter-spacing:.1em;}
+    .face .big{font-size:12px; font-weight:800; letter-spacing:.08em; color:rgba(255,255,255,.86); text-align:center; padding:0 12px; line-height:1.25;}
+    .face.reversed{transform: rotate(180deg);}
+
+    .tcardBody{padding: 0 12px 12px; color:rgba(255,255,255,.90); font-size:13px; line-height:1.62;}
+    .line{padding:10px 0; border-top:1px solid rgba(255,255,255,.08);}
+    .line:first-child{border-top:0}
+    .k{color:rgba(255,255,255,.90); font-weight:900; margin-right:6px;}
+
+    /* Keyword chips */
+    .kwWrap{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
+    .kw{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.88);
+      white-space:nowrap;
+    }
+    .kw.rev{border-color:rgba(245,158,11,.25); background:rgba(245,158,11,.10)}
+    .kw.up{border-color:rgba(96,165,250,.25); background:rgba(96,165,250,.10)}
+
+    details{
+      margin-top:10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.14);
+      overflow:hidden;
+    }
+    summary{
+      cursor:pointer;
+      padding:10px 12px;
+      color: rgba(255,255,255,.88);
+      font-weight:800;
+      list-style:none;
+    }
+    summary::-webkit-details-marker{display:none;}
+    .detailsBody{padding:0 12px 12px; color:rgba(255,255,255,.86); font-size:12.5px; line-height:1.6;}
+    .note{
+      margin-top:10px;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid rgba(245,158,11,.25);
+      background: rgba(245,158,11,.10);
+      color: rgba(255,255,255,.88);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .empty{
+      padding:14px;
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:16px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      background: rgba(0,0,0,.12);
+    }
+    .small{font-size:12px; color:var(--muted);}
+/* ===== Yes / No 表示を大きくする ===== */
+.ynRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+.yn{
+  font-size:16px;        /* ← 大きさ（ここを18や20にしてもOK） */
+  font-weight:900;
+  padding:10px 14px;
+  border-radius:999px;
+  border:2px solid rgba(255,255,255,.4);
+  background: rgba(255,255,255,.15);
+}
+
+.yn.up{
+  border-color: #4ade80;
+  background: rgba(74,222,128,.25);
+}
+
+.yn.rev{
+  border-color: #facc15;
+  background: rgba(250,204,21,.25);
+}
+.cardWrap{
+  display:flex;
+  justify-content:center;
+  margin-top:18px;
+}
+
+/* 1枚引きの表示（上の1枚だけ出るカード） */
+.cardWrap{
+  display:flex;
+  justify-content:center;
+  margin-top:18px;
+}
+.cardFrame{
+  width: min(360px, 78vw);   /* 中央で大きめ */
+}
+#tarotCard.tarotCard{
+  width: 100%;
+  height: auto;
+  display:block;
+  aspect-ratio: 2 / 3;       /* 崩れ防止 */
+  object-fit: cover;
+  border-radius:18px;
+  box-shadow: 0 16px 30px rgba(0,0,0,.40);
+  border:1px solid rgba(255,255,255,.18);
+}
+
+/* 逆位置：回転だけでOK（translateは不要） */
+#tarotCard.tarotCard.reversed{
+  transform: rotate(180deg);
+}
+/* === 強制テキスト可視化（応急） === */
+/* 応急の強制は最小限に */
+body{ color: var(--text); }
+
+
+/* ===== 表示レイアウト（最終決定版） ===== */
+.cardsGrid{
+  margin-top:14px;
+  display:grid;
+  gap:16px;
+}
+
+.cardsGrid.single{
+  grid-template-columns: 1fr;
+  justify-items:center;
+}
+
+.cardsGrid.three{
+  grid-template-columns: repeat(3, 1fr);
+  justify-items:center;
+  align-items:start;
+}
+
+/* 画像サイズ（全体） */
+.cardImg{
+  width: min(360px, 28vw); /* 3枚とも大きい */
+  max-width: 92%;
+  height:auto;
+  display:block;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.45),
+    0 0 36px rgba(240,171,252,.12);
+}
+.cardImg.reversed{ transform: rotate(180deg); }
+
+/* 真ん中だけほんの少し強調（不要なら削除OK） */
+.cardsGrid.three .tcard:nth-child(2) .cardImg{
+  width: min(400px, 32vw);
+}
+
+/* モバイル */
+@media (max-width: 520px){
+  .cardsGrid.three{ gap:10px; }
+  .cardImg{ width: 30vw; }
+  .cardsGrid.three .tcard:nth-child(2) .cardImg{ width: 34vw; }
+}
+
+
+  </style>
+</head>
+<body>
+  <div style="position:fixed;bottom:12px;right:12px;z-index:9999;
+background:#000a;border:1px solid #fff3;color:#fff;padding:8px 10px;border-radius:10px;
+font:12px/1.2 ui-sans-serif;">
+  VERSION: 2025-12-24-1
+</div>
+
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>Angelique Tarot（CSV読み込み版）</h1>
+        <p>キーワード10個 / 長文（コア・注釈・天使）/ Yes・No（正逆）を表示。逆位置でも本文は「正位置」をメインにして、必要なら逆位置文は折りたたみで見られます。</p>
+      </div>
+    </header>
+
+    <div class="panel topGrid">
+      <div>
+        <div id="creatorOnly"></div>
+         <div class="fileBox">
+          <div>
+            <div style="font-weight:800; font-size:14px; margin-bottom:6px;">① CSVを読み込む</div>
+             <input id="csvFile" type="file" accept=".csv,text/csv" />
+             <div class="hint">
+              ※ 文字化け対策：CSVは<strong>UTF-8（できればUTF-8 with BOM）</strong>で保存。<br>
+              ※ 読み込んだCSVはブラウザに保存（localStorage）され、次回も使えます。
+             </div>
+            </div>
+            <div style="margin-left:auto; display:flex; gap:10px; flex-wrap:wrap;">
+             <button class="secondary" id="btnUseSaved">保存済みCSVを使う</button>
+             <button class="secondary" id="btnClearSaved">保存を消す</button>
+           </div>
+         </div>
+        <div class="status" id="status"> Angelique Tarot はすぐに使えます ✨</div>
+        </div>
+       </div>
+
+      <div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-weight:800; font-size:14px;">② 引き方を選ぶ</div>
+
+          <div class="drawMode">
+            <label class="chip">
+              <input type="radio" name="drawMode" value="1" checked />
+              <div>
+                <strong>1枚（ワンオラクル）</strong><br />
+                <span>いまのメッセージ</span>
+              </div>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="drawMode" value="3" />
+              <div>
+                <strong>3枚（深掘り）</strong><br />
+                <span>過去 / 現在 / 未来</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="btnRow">
+            <button id="btnDraw">カードを引く</button>
+          </div>
+
+          <div class="small">
+            ※逆位置はカードだけ逆に表示。<br>
+            ※本文（コア/注釈/天使/行動）は<strong>正位置をメイン</strong>に表示（あなたの方針）。<br>
+            ※逆位置文は折りたたみで確認できます。
+          </div>
+        </div>
+      </div>
+    </div>
+
+  
+
+
+    <div class="panel stage">
+      <div class="stageTop">
+        <div class="stageTitle">
+          <h2>シャッフル</h2>
+          <p>演出 → 引いた結果を表示</p>
+        </div>
+        <div class="small" id="deckInfo">デッキ：未読み込み</div>
+      </div>
+
+      <div class="shuffleArea" id="shuffleArea">
+        <div class="deck"></div>
+        <div class="fly"></div><div class="fly"></div><div class="fly"></div>
+        <div class="fly"></div><div class="fly"></div><div class="fly"></div>
+      </div>
+
+      <div id="result" style="margin-top:14px;">
+        <div class="empty">
+          ここに結果が出ます。<br>
+          ① CSVを読み込む → ② 1枚/3枚を選ぶ → ③「カードを引く」
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+    const STORAGE_KEY = "angelique_tarot_csv_rows_v2";
+    let cards = [];
+    const IS_CREATOR = true; // ← あなたのPCは true / 公開用は false
+
+function applyCreatorMode(){
+  const el = document.getElementById("creatorOnly");
+  if(!IS_CREATOR && el){
+    el.style.display = "none";
+  }
+}
+
+
+  
+    const elFile = document.getElementById("csvFile");
+    const elStatus = document.getElementById("status");
+    const elDeckInfo = document.getElementById("deckInfo");
+    const elShuffleArea = document.getElementById("shuffleArea");
+    const elResult = document.getElementById("result");
+
+    document.getElementById("btnDraw").addEventListener("click", onDraw);
+    document.getElementById("btnUseSaved").addEventListener("click", useSaved);
+    document.getElementById("btnClearSaved").addEventListener("click", clearSaved);
+    elFile.addEventListener("change", onPickFile);
+const CSV_PATH = "public/data/deck.csv";
+
+function guessDelimiterFromText(text){
+  const firstLine = (text || "").split(/\r?\n/)[0] || "";
+  const tabCount = (firstLine.match(/\t/g) || []).length;
+  const commaCount = (firstLine.match(/,/g) || []).length;
+  // タブの方が多ければTSV、それ以外はCSV
+  return tabCount > commaCount ? "\t" : ",";
+}
+
+async function loadBundledCsv(){
+  console.log("loadBundledCsv called");
+  setStatus("同梱CSVを読み込み中...");
+  console.log("CSV_PATH =", CSV_PATH);
+
+  try{
+    const res = await fetch(CSV_PATH, { cache: "no-store" });
+    if(!res.ok) throw new Error(`fetch failed: ${res.status} ${res.statusText}`);
+    const text = await res.text();
+
+    const delim = guessDelimiterFromText(text);
+    console.log("guessed delimiter =", JSON.stringify(delim));
+
+const results = Papa.parse(text, {
+  header: true,
+  skipEmptyLines: true,
+  delimiter: delim
+});
+
+
+// ===== Column1〜 行を自動スキップする =====
+if (results.meta?.fields?.[0]?.toLowerCase() === "column1") {
+  console.log("Dummy header detected. Re-parsing CSV...");
+  results.data.shift();              // ダミー行を捨てる
+}
+// ========================================
+
+    console.log("Papa meta.fields:", results.meta?.fields);
+    console.log("First row sample:", results.data?.[0]);
+
+   const rows = (results.data || [])
+  .map(normalizeRow)
+  .filter(r => r && r.id);
+
+
+    console.log("normalized rows:", rows.length, rows[0]);
+
+    if(!rows.length){
+      setStatus("同梱CSVの読み込みはできたが、id が取れません（ヘッダー名/区切りの可能性）。");
+      return;
+    }
+
+    if(!validateCards(rows)){
+      setStatus("同梱CSVの必須列（id,name_ja,name_en,image）が不足しています。");
+      return;
+    }
+
+    cards = rows;
+    setDeckInfo();
+    setStatus(`同梱CSV 読み込み完了：${cards.length}枚。引けます。`);
+    showReady();
+  }catch(e){
+    console.error(e);
+    setStatus("同梱CSVの読み込みに失敗しました（Console参照）。");
+  }
+}
+
+
+function boot(){
+   applyCreatorMode();   // ← これを追加
+  loadBundledCsv(); // ★同梱CSVを自動で読む
+}
+boot();
+
+
+
+    function setStatus(msg){ elStatus.textContent = msg; }
+    function setDeckInfo(){
+      elDeckInfo.textContent = cards.length ? `デッキ：${cards.length}枚 読み込み済み` : "デッキ：未読み込み";
+    }
+
+
+function pick(row, key){
+  // 完全一致
+  if (row[key] != null) return row[key];
+
+  // trim/BOMを無視して一致させる
+  const want = normalizeKey(key);
+  const hit = Object.keys(row).find(k => normalizeKey(k) === want);
+  return hit ? row[hit] : "";
+}
+
+function normalizeKey(s){
+  return (s ?? "")
+    .toString()
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .toLowerCase();
+}
+
+
+
+
+
+function pickAny(row, candidates){
+  for(const c of candidates){
+    const v = pick(row, c);
+    if(v != null && String(v).trim() !== "") return String(v).trim();
+  }
+  return "";
+}
+
+
+
+function normalizeImagePath(s){
+  return (s ?? "")
+    .toString()
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .replace(/^\/+/, "")
+    .replace(/\\/g, "/");   // Windowsの \ を / に
+}
+
+function normalizeRow(row){
+  // キー正規化（BOM/空白/大小）
+  const norm = (s) => (s ?? "").toString().replace(/^\uFEFF/, "").trim().toLowerCase();
+
+  // row から key を大小/BOM無視で取る
+  const get = (key) => {
+    const want = norm(key);
+    const hit = Object.keys(row).find(k => norm(k) === want);
+    return hit ? String(row[hit] ?? "").trim() : "";
+  };
+
+  // 1) 通常ヘッダー（id, arcana, ... image）で来た場合
+  const idNormal = get("id");
+  if (idNormal) {
+    // ヘッダー行が混じる保険
+    if (idNormal.toLowerCase() === "id") return null;
+
+    return {
+      id: idNormal,
+      arcana: get("arcana"),
+      suit: get("suit"),
+      number: get("number"),
+      name_ja: get("name_ja"),
+      name_en: get("name_en"),
+      element: get("element"),
+      polarity: get("polarity"),
+      yes_no_upright: get("yes_no_upright"),
+      yes_no_reversed: get("yes_no_reversed"),
+      timing: get("timing"),
+      themes: get("themes"),
+      keywords_upright: get("keywords_upright"),
+      keywords_reversed: get("keywords_reversed"),
+      core_upright: get("core_upright"),
+      interpretation_upright: get("interpretation_upright"),
+      angel_upright: get("angel_upright"),
+      action_upright: get("action_upright"),
+      core_reversed: get("core_reversed"),
+      interpretation_reversed: get("interpretation_reversed"),
+      angel_reversed: get("angel_reversed"),
+      action_reversed: get("action_reversed"),
+      image: normalizeImagePath(get("image")),
+    };
+  }
+
+  // 2) Column1〜Column23 で来た場合
+  const getCol = (n) => {
+    const want = "column" + n;
+    const hit = Object.keys(row).find(k => norm(k) === want);
+    return hit ? String(row[hit] ?? "").trim() : "";
+  };
+
+  const idCol = getCol(1);
+  if (!idCol || idCol.toLowerCase() === "id") return null;
+
+  return {
+    id: idCol,
+    arcana: getCol(2),
+    suit: getCol(3),
+    number: getCol(4),
+    name_ja: getCol(5),
+    name_en: getCol(6),
+    element: getCol(7),
+    polarity: getCol(8),
+    yes_no_upright: getCol(9),
+    yes_no_reversed: getCol(10),
+    timing: getCol(11),
+    themes: getCol(12),
+    keywords_upright: getCol(13),
+    keywords_reversed: getCol(14),
+    core_upright: getCol(15),
+    interpretation_upright: getCol(16),
+    angel_upright: getCol(17),
+    action_upright: getCol(18),
+    core_reversed: getCol(19),
+    interpretation_reversed: getCol(20),
+    angel_reversed: getCol(21),
+    action_reversed: getCol(22),
+    image: normalizeImagePath(getCol(23)),
+  };
+}
+
+
+
+function validateCards(list){
+  // id さえあればOK（imageは無くても動く）
+  const bad = list.find(r => !r.id);
+  return !bad;
+}
+
+
+
+ function onPickFile(){
+  const file = elFile.files?.[0];
+  if(!file) return;
+
+  setStatus("CSVを読み込み中...");
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const text = reader.result?.toString() || "";
+      const delim = guessDelimiterFromText(text);
+      console.log("file guessed delimiter =", JSON.stringify(delim));
+
+const results = Papa.parse(text, {
+  header: true,
+  skipEmptyLines: true,
+  delimiter: delim
+});
+
+
+
+// ===== Column1〜 行を自動スキップする =====
+if (results.meta?.fields?.[0]?.toLowerCase() === "column1") {
+  console.log("Dummy header detected. Re-parsing CSV...");
+  results.data.shift();
+}
+// ========================================
+
+
+
+
+      const rows = (results.data || [])
+  .map(normalizeRow)
+  .filter(r => r && r.id);
+
+
+      if(!rows.length){
+        setStatus("CSVにデータがありません（区切り/ヘッダーを確認）。");
+        return;
+      }
+      if(!validateCards(rows)){
+        setStatus("必須列（id,name_ja,name_en,image）が不足しています。");
+        return;
+      }
+
+      cards = rows;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+      setDeckInfo();
+      setStatus(`読み込み完了：${cards.length}枚。引けます。`);
+      showReady();
+    }catch(e){
+      console.error(e);
+      setStatus("読み込みでエラー。CSV形式を確認してください。");
+    }
+  };
+  reader.onerror = () => {
+    setStatus("ファイルの読み込みに失敗しました。");
+  };
+  reader.readAsText(file, "utf-8");
+}
+
+    function useSaved(){
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if(!saved){
+        setStatus("保存済みCSVがありません。まずCSVを読み込んでください。");
+        return;
+      }
+      try{
+        const rows = JSON.parse(saved);
+        if(!Array.isArray(rows) || !rows.length){
+          setStatus("保存済みCSVが壊れています。いったん消して読み込み直してください。");
+          return;
+        }
+        cards = rows;
+        setDeckInfo();
+        setStatus(`保存済みCSVを読み込みました：${cards.length}枚。`);
+        showReady();
+      }catch(e){
+        setStatus("保存済みCSVの読み込みに失敗。消して読み込み直してください。");
+      }
+    }
+
+    function clearSaved(){
+  localStorage.removeItem(STORAGE_KEY);
+  cards = [];
+  setDeckInfo();
+  setStatus("保存を削除しました。CSVを読み込んでください。");
+  elResult.innerHTML = `<div class="empty">
+    ここに結果が出ます。<br>
+    ① CSVを読み込む → ② 1枚/3枚を選ぶ → ③「カードを引く」
+  </div>`;
+}
+
+
+    function getDrawCount(){
+      const el = document.querySelector('input[name="drawMode"]:checked');
+      return el ? parseInt(el.value, 10) : 1;
+    }
+
+    function showReady(){
+      elResult.innerHTML = `<div class="empty">
+        準備OK。<br>
+        ② 1枚/3枚を選ぶ → ③「カードを引く」
+      </div>`;
+    }
+
+    function startShuffle(){ elShuffleArea.classList.add("shuffling"); }
+    function stopShuffle(){ elShuffleArea.classList.remove("shuffling"); }
+    function randInt(n){ return Math.floor(Math.random() * n); }
+
+    function drawUnique(count){
+  const used = new Set();
+  const picked = [];
+  while(picked.length < count){
+    const idx = randInt(cards.length);
+    if(used.has(idx)) continue;
+    used.add(idx);
+    const card = cards[idx];
+    const isReversed = Math.random() < 0.5;
+    picked.push({ card, isReversed });
+  }
+  return picked;
+}
+
+
+    async function onDraw(){
+      if(!cards.length){
+        setStatus("先にCSVを読み込んでください。");
+        return;
+      }
+      const count = getDrawCount();
+      setStatus(`シャッフル中…（${count}枚引き）`);
+      startShuffle();
+      await new Promise(r => setTimeout(r, 1400));
+      stopShuffle();
+
+      const picked = drawUnique(count);
+      console.log("picked[0] raw =", picked[0]);
+console.log("picked[0] json =", JSON.stringify(picked[0], null, 2));
+console.log("picked[0].card json =", JSON.stringify(picked[0]?.card, null, 2));
+
+ 
+
+
+     const labels3 = ["過去", "現在", "未来"];
+const gridClass = count === 1 ? "cardsGrid single" : "cardsGrid three";
+
+elResult.innerHTML = `
+  <div class="${gridClass}">
+    ${picked.map((p, i) =>
+      renderCard(p.card, p.isReversed, count === 3 ? labels3[i] : "ワンオラクル")
+    ).join("")}
+  </div>
+`;
+
+      setStatus(`結果表示：${count}枚引き。`);
+    }
+
+    // --- キーワード：| 区切りで最大10個 ---
+    function splitKeywords(str, limit=10){
+      const raw = (str ?? "").toString().trim();
+      if(!raw) return [];
+      return raw.split("|").map(s => s.trim()).filter(Boolean).slice(0, limit);
+    }
+
+    function metaLine(card){
+      const parts = [];
+      if(card.arcana) parts.push(`区分:${card.arcana}`);
+      if(card.suit) parts.push(`スート:${card.suit}`);
+      if(card.number) parts.push(`番号:${card.number}`);
+      if(card.element) parts.push(`元素:${card.element}`);
+      if(card.polarity) parts.push(`極性:${card.polarity}`);
+      if(card.timing) parts.push(`時期:${card.timing}`);
+           return parts.join(" / ");
+    }
+
+ // 逆位置の時は逆位置だけ表示（正位置は表示しない）
+function renderCard(card, isReversed, positionLabel){
+  // 逆位置なら reversed、正位置なら upright を採用
+  const kw = splitKeywords(isReversed ? card.keywords_reversed : card.keywords_upright, 10);
+
+  const core = (isReversed ? card.core_reversed : card.core_upright) || "";
+  const interpretation = (isReversed ? card.interpretation_reversed : card.interpretation_upright) || "";
+  const angel = (isReversed ? card.angel_reversed : card.angel_upright) || "";
+  const action = (isReversed ? card.action_reversed : card.action_upright) || "";
+
+  const yn = (isReversed ? card.yes_no_reversed : card.yes_no_upright) || "";
+
+  const meta = metaLine(card);
+  const themes = (card.themes ?? "").toString().trim();
+
+  return `
+    <div class="tcard">
+      <div class="tcardHeader">
+        <div class="tcardTitle">
+          <div class="pos">${escapeHtml(positionLabel)}</div>
+          <div class="name">${escapeHtml(card.name_ja)} <span class="sub">(${escapeHtml(card.name_en)})</span></div>
+          <div class="sub">${escapeHtml(meta)}</div>
+          ${themes ? `<div class="sub">テーマ：${escapeHtml(themes)}</div>` : ``}
+        </div>
+        <div class="badge ${isReversed ? "rev" : "up"}">${isReversed ? "逆位置" : "正位置"}</div>
+      </div>
+
+     <div class="tcardVisual">
+  <img
+    class="cardImg ${isReversed ? "reversed" : ""}"
+    src="${cardImageUrl(card.image)}"
+    alt="${escapeHtml(card.name_ja)}"
+    onerror="this.src='public/cards/back.png'"
+  />
+</div>
+
+
+
+      ${yn ? `
+        <div class="ynRow">
+          <div class="yn ${isReversed ? "rev" : "up"}">
+            YES / NO：${escapeHtml(yn)}
+          </div>
+        </div>
+      ` : ``}
+
+      <div class="tcardBody">
+        <div class="line">
+          <span class="k">キーワード（${isReversed ? "逆" : "正"}）：</span>
+          <div class="kwWrap">
+            ${kw.length
+              ? kw.map(w => `<span class="kw ${isReversed ? "rev" : "up"}">${escapeHtml(w)}</span>`).join("")
+              : `<span class="small">（なし）</span>`}
+          </div>
+        </div>
+
+        <div class="line"><span class="k">要点：</span>${escapeHtml(core)}</div>
+        <div class="line"><span class="k">読み解き：</span>${escapeHtml(interpretation)}</div>
+        <div class="line"><span class="k">天使からの言葉：</span>${escapeHtml(angel)}</div>
+        <div class="line"><span class="k">今日の一歩：</span>${escapeHtml(action)}</div>
+      </div>
+    </div>
+  `;
+}
+function cardImageUrl(image){
+  let raw = (image ?? "").toString().trim();
+  if(!raw) return "public/cards/back.png";
+
+  raw = raw
+    .replace(/^\uFEFF/, "")
+    .replace(/^"+|"+$/g, "")
+    .replace(/^'+|'+$/g, "")
+    .replace(/^\/+/, "")
+    .replace(/\\/g, "/");
+
+  // 拡張子が無いなら .png を付ける（超重要）
+  if(!/\.(png|jpg|jpeg|webp)$/i.test(raw)){
+    raw += ".png";
+  }
+
+  // フルURLはそのまま
+  if(/^https?:\/\//i.test(raw)) return raw;
+
+  // すでに public/ ならそのまま
+  if(raw.startsWith("public/")) return encodeURI(raw);
+
+  // cards/ なら public/ を足す
+  if(raw.startsWith("cards/")) return encodeURI("public/" + raw);
+
+  // それ以外は public/cards/ 配下
+  return encodeURI("public/cards/" + raw);
+}
+
+
+function escapeHtml(str){
+  return (str ?? "").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+  </script>
+</body>
+</html>
