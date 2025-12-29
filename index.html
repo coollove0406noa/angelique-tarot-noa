@@ -1064,6 +1064,7 @@ function cardImageUrl(image){
   if(!raw) return "public/cards/back.webp"; // back.pngのままなら back.png に変更してOK
 
   raw = raw
+    raw = raw.replace(/\.(png|jpg|jpeg)$/i, ".webp");
     .replace(/^\uFEFF/, "")
     .replace(/^"+|"+$/g, "")
     .replace(/^'+|'+$/g, "")
@@ -1098,6 +1099,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
