@@ -1077,13 +1077,10 @@ function cardImageUrl(image){
 
   // フルURLはそのまま
   if(/^https?:\/\//i.test(raw)) return raw;
-
   // public/ から始まるならそのまま
   if(raw.startsWith("public/")) return encodeURI(raw);
-
   // cards/ なら public/ を足す
   if(raw.startsWith("cards/")) return encodeURI("public/" + raw);
-
   // それ以外は public/cards/ 配下
   return encodeURI("public/cards/" + raw);
 }
@@ -1101,6 +1098,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
