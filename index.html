@@ -21,27 +21,13 @@
 
 
     *{box-sizing:border-box}
-   body{
-  margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
-
+ body{
   background:
-    /* 光のヴェール */
-    radial-gradient(1200px 700px at 50% -10%, rgba(240,171,252,.25), transparent 60%),
-    radial-gradient(900px 600px at 80% 10%, rgba(165,180,252,.18), transparent 55%),
-
-    /* ★ 背景画像 */
-    url("public/bg/angel_bg1.webp") center / cover no-repeat,
-
-    /* ベース色（画像が読めない時の保険） */
+    linear-gradient(rgba(14,11,22,.65), rgba(14,11,22,.65)),
+    url("public/angel_bg1.webp") center / cover no-repeat,
     var(--bg);
-
-  color: var(--text);
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  padding:18px;
 }
+
 
 
 
@@ -1096,6 +1082,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
