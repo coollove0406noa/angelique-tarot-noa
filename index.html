@@ -586,6 +586,30 @@ body{ color: var(--text); }
   position: relative;
   z-index: 10;
 }
+:root{
+  --deck-w: 220px;          /* シャッフル束：幅 */
+  --deck-h: 320px;          /* シャッフル束：高さ（カード比率に） */
+  --deck-radius: 22px;      /* 角丸 */
+}
+
+/* シャッフルの箱を「カード高さ + 余白」に */
+.shuffleArea{
+  height: calc(var(--deck-h) + 80px) !important;
+  min-height: calc(var(--deck-h) + 80px) !important;
+  overflow: hidden;
+}
+.deck{
+  width: var(--deck-w) !important;
+  height: var(--deck-h) !important;
+  border-radius: var(--deck-radius) !important;
+  background: url("public/cards/back.png") center / cover no-repeat;
+}
+.fly{
+  width: calc(var(--deck-w) * 0.72) !important;
+  height: calc(var(--deck-h) * 0.72) !important;
+  border-radius: calc(var(--deck-radius) * 0.95) !important;
+  background: url("public/cards/back.png") center / cover no-repeat;
+}
 
   </style>
 </head>
@@ -1204,6 +1228,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
