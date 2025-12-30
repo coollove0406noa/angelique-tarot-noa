@@ -644,6 +644,76 @@ body{ color: var(--text); }
   background-size: contain !important;  /* ←切れない */
   background-color: rgba(0,0,0,.18);   /* 余白が出た時も綺麗 */
 }
+/* ================================
+   📱 Mobile最適化：シャッフル＆3枚引き
+   ================================ */
+
+/* まずはPC/共通の基準（触るのはここだけでもOK） */
+:root{
+  --shuffle-w: 220px;  /* PCのシャッフル幅 */
+}
+
+/* 3枚引き：重なりの原因は「カードが大きすぎ」or「tcardが伸びてる」なので、
+   グリッドの各列を“必ず均等”にして、画像幅をvwで固定 */
+.cardsGrid.three{
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+.cardsGrid.three .tcard{
+  width: 100%;
+  min-width: 0; /* ← これがないと中身で横に広がって重なることがある */
+}
+.cardsGrid.three .cardImg{
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto;
+}
+
+/* ---- モバイル本番調整 ---- */
+@media (max-width: 520px){
+  /* シャッフルカードが大きすぎる問題 */
+  :root{
+    --shuffle-w: 150px; /* ←携帯は小さめに */
+  }
+
+  /* シャッフル箱も連動して縮める */
+  .shuffleArea{
+    height: calc(var(--shuffle-w) * 1.5 + 60px) !important;
+    min-height: calc(var(--shuffle-w) * 1.5 + 60px) !important;
+  }
+
+  /* シャッフル束＆飛ぶカード：比率は維持したまま縮小 */
+  .deck{
+    width: var(--shuffle-w) !important;
+    aspect-ratio: 2 / 3 !important;
+  }
+  .fly{
+    width: calc(var(--shuffle-w) * 0.78) !important;
+    aspect-ratio: 2 / 3 !important;
+  }
+
+  /* 3枚引き：絶対に重ならないサイズ設計（3枚=各1/3幅） */
+  .cardsGrid.three{
+    gap: 8px !important;
+  }
+
+  /* 画像をvw基準で固定（画面幅に対して常に収まる） */
+  .cardsGrid.three .cardImg{
+    width: 28vw !important;      /* ← ここを 26〜30 で調整 */
+    max-width: 28vw !important;
+  }
+  /* 真ん中だけ少し強調したい場合（任意。不要なら削除OK） */
+  .cardsGrid.three .tcard:nth-child(2) .cardImg{
+    width: 30vw !important;
+    max-width: 30vw !important;
+  }
+
+  /* カード枠（tcard）自体が横に広がらないように保険 */
+  .cardsGrid.three .tcard{
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
 
   </style>
 </head>
@@ -1262,6 +1332,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
