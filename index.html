@@ -498,6 +498,61 @@ body{ color: var(--text); }
 .shuffling .fly{
   animation-timing-function: cubic-bezier(.22,.61,.36,1);
 }
+/* ===== サイズ調整（ここだけ触ればOK）===== */
+:root{
+  --deck-size: 240px;     /* シャッフル中央の束（大きく） */
+  --fly-w: 160px;         /* 飛ぶカード幅（大きく） */
+  --fly-h: 230px;         /* 飛ぶカード高さ（大きく） */
+
+  --result-w-1: min(300px, 78vw); /* 1枚引きの結果（少し小さく） */
+  --result-w-3: min(240px, 26vw); /* 3枚引きの結果（小さく） */
+  --result-w-3-mid: min(260px, 28vw); /* 真ん中だけ少し強調 */
+}
+
+/* シャッフルエリア高さも少し上げる（大きくした分の余裕） */
+.shuffleArea{
+  height: 220px;
+}
+
+/* 中央デッキ（束） */
+.deck{
+  width: var(--deck-size) !important;
+  height: var(--deck-size) !important;
+  border-radius: 28px;
+}
+
+/* 飛ぶカード */
+.fly{
+  width: var(--fly-w) !important;
+  height: var(--fly-h) !important;
+  border-radius: 22px;
+}
+
+/* 結果：3枚引き（いま cardImg が大きすぎるので下げる） */
+.cardsGrid.three .cardImg{
+  width: var(--result-w-3) !important;
+  max-width: 100%;
+}
+
+/* 結果：真ん中だけ少し強調（任意） */
+.cardsGrid.three .tcard:nth-child(2) .cardImg{
+  width: var(--result-w-3-mid) !important;
+}
+
+/* 結果：1枚引き（#tarotCard は今使ってないけど保険で） */
+.cardsGrid.single .cardImg{
+  width: var(--result-w-1) !important;
+  max-width: 100%;
+}
+
+/* スマホ：3枚横並びの崩れ防止 */
+@media (max-width: 520px){
+  .shuffleArea{ height: 200px; }
+  :root{
+    --result-w-3: 28vw;
+    --result-w-3-mid: 32vw;
+  }
+}
 
 
   </style>
@@ -1117,6 +1172,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
