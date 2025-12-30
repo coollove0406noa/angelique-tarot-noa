@@ -574,6 +574,18 @@ body{ color: var(--text); }
     min-height: 200px;
   }
 }
+/* クリックが吸われるのを防ぐ（超重要） */
+.shuffleArea,
+.shuffleArea *{
+  pointer-events: none;
+}
+
+/* ボタンは必ず押せるようにする */
+#btnDraw{
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+}
 
   </style>
 </head>
@@ -588,7 +600,7 @@ font:12px/1.2 ui-sans-serif;">
     <header>
       <div class="title">
         <h1>Angelique Tarot（CSV読み込み版）</h1>
-        <p>キーワード10個 / 長文（コア・注釈・天使）/ Yes・No（正逆）を表示。逆位置でも本文は「正位置」をメインにして、必要なら逆位置文は折りたたみで見られます。</p>
+        <p>キーワード10個 / （コア・注釈・天使）/ Yes・No（正逆）を表示。</p>
       </div>
     </header>
 
@@ -1192,6 +1204,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
