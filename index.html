@@ -289,9 +289,9 @@ header,
 }
 
 /* スマホ調整 */
-@media (max-width: 520px){
+@media (max-width: 480px){
   .cardsGrid.three{ gap: 10px; }
-  .cardImg{ width: 30vw; } /* 3枚横で収まる */
+  .cardImg{ width: 20vw; } /* 3枚横で収まる */
   .cardsGrid.three .tcard:nth-child(2) .cardImg{ width: 34vw; }
 }
 
@@ -470,7 +470,7 @@ body{ color: var(--text); }
 }
 
 /* モバイル */
-@media (max-width: 520px){
+@media (max-width: 480px){
   .cardsGrid.three{ gap:10px; }
   .cardImg{ width: 30vw; }
   .cardsGrid.three .tcard:nth-child(2) .cardImg{ width: 34vw; }
@@ -546,7 +546,7 @@ body{ color: var(--text); }
 }
 
 /* スマホ：3枚横並びの崩れ防止 */
-@media (max-width: 520px){
+@media (max-width: 480px){
   .shuffleArea{ height: 200px; }
   :root{
     --result-w-3: 28vw;
@@ -554,6 +554,26 @@ body{ color: var(--text); }
   }
 }
 
+/* ===== シャッフル表示エリア：デッキサイズに合わせて自動で広げる ===== */
+:root{
+  /* すでに入れてるならここは合わせるだけでOK */
+  --deck-size: 240px;
+}
+
+/* deck が大きくなっても切れない高さにする */
+.shuffleArea{
+  height: calc(var(--deck-size) + 80px) !important; /* ← 余白ぶん増やす */
+  min-height: 220px;
+  overflow: hidden; /* 演出を枠内に収めたいなら hidden のままでOK */
+}
+
+/* スマホは少し控えめに */
+@media (max-width: 520px){
+  .shuffleArea{
+    height: calc(var(--deck-size) + 60px) !important;
+    min-height: 200px;
+  }
+}
 
   </style>
 </head>
@@ -1172,6 +1192,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
