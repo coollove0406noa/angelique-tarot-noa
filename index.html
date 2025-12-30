@@ -714,6 +714,84 @@ body{ color: var(--text); }
     min-width: 0 !important;
   }
 }
+/* =====================================
+   📱 Mobileでも3枚横並びを守る（重なり解消）
+   ===================================== */
+@media (max-width: 520px){
+
+  /* 3列を維持しつつ“はみ出し禁止”の土台 */
+  .cardsGrid.three{
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    align-items: start;
+  }
+
+  /* これが超重要：中身が原因で列幅より広がるのを止める */
+  .tcard,
+  .tcardHeader,
+  .tcardTitle,
+  .tcardBody{
+    min-width: 0 !important;
+  }
+  .tcard{
+    width: 100% !important;
+    overflow: hidden !important; /* 隣に乗り上げるのを物理的に防ぐ */
+  }
+
+  /* 画像は列幅に100%フィット（=重なりの起点を消す） */
+  .cardsGrid.three .cardImg{
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* ヘッダーは“縦積み”にして横の突き抜けを防ぐ（横並び表示は維持） */
+  .tcardHeader{
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    padding: 10px 10px 8px !important;
+  }
+
+  /* バッジも折り返し可に */
+  .badge{
+    font-size: 11px !important;
+    padding: 5px 8px !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+  }
+
+  /* YES/NO ピルが主犯：小さく＆折り返し＆列から出ない */
+  .ynRow{
+    margin-top: 8px !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+  .yn{
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+    line-height: 1.2 !important;
+    max-width: 100% !important;
+    white-space: normal !important;       /* ←折り返す */
+    overflow-wrap: anywhere !important;   /* ←保留/日本語でも突き抜けない */
+  }
+
+  /* 文字量も少し締めて“3枚横”の品を保つ */
+  .tcardBody{
+    padding: 0 10px 10px !important;
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+  }
+  .tcardTitle .name{ font-size: 13px !important; }
+  .tcardTitle .sub{ font-size: 11px !important; }
+
+  /* キーワードチップが横に長いと押し出すので少し小さく */
+  .kw{
+    font-size: 11px !important;
+    padding: 5px 8px !important;
+    max-width: 100% !important;
+  }
+}
 
   </style>
 </head>
@@ -1332,6 +1410,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
