@@ -800,9 +800,6 @@ body{ color: var(--text); }
   color:rgba(255,255,255,.95);
 }
 
-if(!mainMessageHTML){
-  mainMessageHTML = coreBlock + interpretationBlock + angelBlock + actionBlock;
-}
 
 
   </style>
@@ -1319,6 +1316,22 @@ elResult.innerHTML = `
       if(card.timing) parts.push(`時期:${card.timing}`);
            return parts.join(" / ");
     }
+function strengthenCore(core, themes){
+  const c = (core ?? "").toString().trim();
+  const t = (themes ?? "").toString().trim();
+
+  // 既に十分長いならそのまま
+  if(c.length >= 55) return c;
+
+  // テーマがあるなら1行添えて厚みを作る（←ここが必ず文字列扱いになるように）
+  const themeLine = t ? `焦点：${t}。` : `焦点：いま一番大事な感覚を見つけること。`;
+
+  return [
+    `状況：${c || "流れの節目にいます。"}`,
+    themeLine,
+    `方向性：無理に急がず、できる一歩に光を当てて。`
+  ].join(" ");
+}
 
  // 逆位置の時は逆位置だけ表示（正位置は表示しない）
 function renderCard(card, isReversed, positionLabel){
@@ -1444,6 +1457,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
