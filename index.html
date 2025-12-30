@@ -792,6 +792,18 @@ body{ color: var(--text); }
     max-width: 100% !important;
   }
 }
+.coreText{
+  margin-top:6px;
+  font-size:14px;
+  line-height:1.7;
+  font-weight:600;
+  color:rgba(255,255,255,.95);
+}
+
+if(!mainMessageHTML){
+  mainMessageHTML = coreBlock + interpretationBlock + angelBlock + actionBlock;
+}
+
 
   </style>
 </head>
@@ -1310,19 +1322,52 @@ elResult.innerHTML = `
 
  // 逆位置の時は逆位置だけ表示（正位置は表示しない）
 function renderCard(card, isReversed, positionLabel){
-  // 逆位置なら reversed、正位置なら upright を採用
-  const kw = splitKeywords(isReversed ? card.keywords_reversed : card.keywords_upright, 10);
 
+  // --- データ取得 ---
+  const kw = splitKeywords(isReversed ? card.keywords_reversed : card.keywords_upright, 10);
   const core = (isReversed ? card.core_reversed : card.core_upright) || "";
   const interpretation = (isReversed ? card.interpretation_reversed : card.interpretation_upright) || "";
   const angel = (isReversed ? card.angel_reversed : card.angel_upright) || "";
   const action = (isReversed ? card.action_reversed : card.action_upright) || "";
-
   const yn = (isReversed ? card.yes_no_reversed : card.yes_no_upright) || "";
-
   const meta = metaLine(card);
   const themes = (card.themes ?? "").toString().trim();
 
+  // --- 表示ブロック ---
+  const coreBlock = `
+    <div class="line">
+      <span class="k">要点：</span>
+      <div class="coreText">${escapeHtml(strengthenCore(core, themes))}</div>
+    </div>
+  `;
+
+  const interpretationBlock = `
+    <div class="line"><span class="k">読み解き：</span>${escapeHtml(interpretation)}</div>
+  `;
+
+  const angelBlock = `
+    <div class="line"><span class="k">天使からの言葉：</span>${escapeHtml(angel)}</div>
+  `;
+
+  const actionBlock = `
+    <div class="line"><span class="k">今日の一歩：</span>${escapeHtml(action)}</div>
+  `;
+
+  // --- 位置別出し分け ---
+  let mainMessageHTML = "";
+
+  if(positionLabel === "過去"){
+    mainMessageHTML = coreBlock;
+  }else if(positionLabel === "現在"){
+    mainMessageHTML = coreBlock + interpretationBlock;
+  }else if(positionLabel === "未来"){
+    mainMessageHTML = angelBlock + actionBlock;
+  }else{
+    // 1枚引き
+    mainMessageHTML = coreBlock + interpretationBlock + angelBlock + actionBlock;
+  }
+
+  // --- HTML返却 ---
   return `
     <div class="tcard">
       <div class="tcardHeader">
@@ -1335,60 +1380,32 @@ function renderCard(card, isReversed, positionLabel){
         <div class="badge ${isReversed ? "rev" : "up"}">${isReversed ? "逆位置" : "正位置"}</div>
       </div>
 
-     <div class="tcardVisual">
-  <img
-    class="cardImg ${isReversed ? "reversed" : ""}"
-    src="${cardImageUrl(card.image)}"
-    alt="${escapeHtml(card.name_ja)}"
-    onerror="this.src='public/cards/back.png'"
-  />
-</div>
-
-
+      <div class="tcardVisual">
+        <img class="cardImg ${isReversed ? "reversed" : ""}"
+          src="${cardImageUrl(card.image)}"
+          alt="${escapeHtml(card.name_ja)}"
+          onerror="this.src='public/cards/back.png'"
+        />
+      </div>
 
       ${yn ? `
         <div class="ynRow">
-          <div class="yn ${isReversed ? "rev" : "up"}">
-            YES / NO：${escapeHtml(yn)}
-          </div>
-        </div>
-      ` : ``}
+          <div class="yn ${isReversed ? "rev" : "up"}">YES / NO：${escapeHtml(yn)}</div>
+        </div>` : ``}
 
       <div class="tcardBody">
         <div class="line">
           <span class="k">キーワード（${isReversed ? "逆" : "正"}）：</span>
           <div class="kwWrap">
-            ${kw.length
-              ? kw.map(w => `<span class="kw ${isReversed ? "rev" : "up"}">${escapeHtml(w)}</span>`).join("")
-              : `<span class="small">（なし）</span>`}
+            ${kw.map(w => `<span class="kw ${isReversed ? "rev" : "up"}">${escapeHtml(w)}</span>`).join("")}
           </div>
         </div>
-function strengthenCore(core, themes){
-  const c = (core ?? "").toString().trim();
-  const t = (themes ?? "").toString().trim();
-
-  // 既に十分長いならそのまま（“詳しすぎ”を防ぐ）
-  if(c.length >= 55) return c;
-
-  // テーマがあるなら1行添えて厚みを作る
-  const themeLine = t ? `焦点：${t}。` : `焦点：いま一番大事な感覚を見つけること。`;
-
-  // 短い要点でも“導き”として成立する3行に整形
-  return [
-    `状況：${c || "流れの節目にいます。"}`
-    , themeLine
-    , `方向性：無理に急がず、できる一歩に光を当てて。`
-  ].join(" ");
-}
-
-        <div class="line"><span class="k">要点：</span>${escapeHtml(strengthenCore(core, themes))}</div>
-        <div class="line"><span class="k">読み解き：</span>${escapeHtml(interpretation)}</div>
-        <div class="line"><span class="k">天使からの言葉：</span>${escapeHtml(angel)}</div>
-        <div class="line"><span class="k">今日の一歩：</span>${escapeHtml(action)}</div>
+        ${mainMessageHTML}
       </div>
     </div>
   `;
 }
+
 // ---- 画像URL（WebP優先）----
 function cardImageUrl(image){
   let raw = (image ?? "").toString().trim();
@@ -1427,6 +1444,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
