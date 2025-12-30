@@ -1363,8 +1363,25 @@ function renderCard(card, isReversed, positionLabel){
               : `<span class="small">（なし）</span>`}
           </div>
         </div>
+function strengthenCore(core, themes){
+  const c = (core ?? "").toString().trim();
+  const t = (themes ?? "").toString().trim();
 
-        <div class="line"><span class="k">要点：</span>${escapeHtml(core)}</div>
+  // 既に十分長いならそのまま（“詳しすぎ”を防ぐ）
+  if(c.length >= 55) return c;
+
+  // テーマがあるなら1行添えて厚みを作る
+  const themeLine = t ? `焦点：${t}。` : `焦点：いま一番大事な感覚を見つけること。`;
+
+  // 短い要点でも“導き”として成立する3行に整形
+  return [
+    `状況：${c || "流れの節目にいます。"}`
+    , themeLine
+    , `方向性：無理に急がず、できる一歩に光を当てて。`
+  ].join(" ");
+}
+
+        <div class="line"><span class="k">要点：</span>${escapeHtml(strengthenCore(core, themes))}</div>
         <div class="line"><span class="k">読み解き：</span>${escapeHtml(interpretation)}</div>
         <div class="line"><span class="k">天使からの言葉：</span>${escapeHtml(angel)}</div>
         <div class="line"><span class="k">今日の一歩：</span>${escapeHtml(action)}</div>
@@ -1410,6 +1427,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
