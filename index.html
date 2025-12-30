@@ -1398,7 +1398,7 @@ function renderCard(card, isReversed, positionLabel){
         <img class="cardImg ${isReversed ? "reversed" : ""}"
           src="${cardImageUrl(card.image)}"
           alt="${escapeHtml(card.name_ja)}"
-          onerror="this.src='public/cards/back.png'"
+          onerror="handleCardImgError(this)"
         />
       </div>
 
@@ -1447,6 +1447,28 @@ function cardImageUrl(image){
   if(raw.startsWith("cards/")) return encodeURI("public/" + raw);
   return encodeURI("public/cards/" + raw);
 }
+function handleCardImgError(img){
+  const tried = parseInt(img.dataset.tried || "0", 10);
+
+  // まず、元の src から「拡張子だけ」差し替えて試す
+  const src = img.getAttribute("src") || "";
+  const base = src.replace(/\.(webp|png|jpg|jpeg)(\?.*)?$/i, ""); // 末尾拡張子を除去
+  const query = (src.match(/(\?.*)$/) || [""])[0];
+
+  const exts = ["webp", "png", "jpg", "jpeg"];
+
+  // すでに back.png なら終了（無限ループ防止）
+  if(src.includes("back.png")) return;
+
+  if(tried < exts.length){
+    img.dataset.tried = String(tried + 1);
+    img.src = `${base}.${exts[tried]}${query}`;
+    return;
+  }
+
+  // 最後の砦：裏面
+  img.src = "public/cards/back.png";
+}
 
 
 // ---- HTMLエスケープ ----
@@ -1462,6 +1484,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
