@@ -610,6 +610,40 @@ body{ color: var(--text); }
   border-radius: calc(var(--deck-radius) * 0.95) !important;
   background: url("public/cards/back.png") center / cover no-repeat;
 }
+/* ===== シャッフル束を「カード比率(2:3)」で固定して、いびつを解消 ===== */
+:root{
+  --shuffle-w: 220px;     /* シャッフルカードの幅（大きさはここ） */
+  --shuffle-r: 22px;      /* 角丸 */
+}
+
+/* 箱もカード高さに合わせて確保（切れ防止） */
+.shuffleArea{
+  height: calc(var(--shuffle-w) * 1.5 + 90px) !important; /* 1.5 = 3/2 */
+  min-height: calc(var(--shuffle-w) * 1.5 + 90px) !important;
+  overflow: hidden;
+}
+
+/* 中央の束（deck） */
+.deck{
+  width: var(--shuffle-w) !important;
+  height: auto !important;
+  aspect-ratio: 2 / 3 !important;          /* ←これが決定打 */
+  border-radius: var(--shuffle-r) !important;
+  background: url("public/cards/back.png") center / cover no-repeat !important;
+}
+
+/* 飛ぶカード（fly）も同じ比率で統一 */
+.fly{
+  width: calc(var(--shuffle-w) * 0.78) !important;
+  height: auto !important;
+  aspect-ratio: 2 / 3 !important;
+  border-radius: calc(var(--shuffle-r) * 0.95) !important;
+  background: url("public/cards/back.png") center / cover no-repeat !important;
+}
+.deck, .fly{
+  background-size: contain !important;  /* ←切れない */
+  background-color: rgba(0,0,0,.18);   /* 余白が出た時も綺麗 */
+}
 
   </style>
 </head>
@@ -1228,6 +1262,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
