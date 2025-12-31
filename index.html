@@ -1392,7 +1392,7 @@ function renderCard(card, isReversed, positionLabel){
 
 function cardImageUrl(image){
   let raw = (image ?? "").toString().trim();
-  if(!raw) return "public/cards/back.png"; // ← public を外す
+  if(!raw) return "public/cards/back.png";  // ここはそのまま
 
   raw = raw
     .replace(/^\uFEFF/, "")
@@ -1401,20 +1401,24 @@ function cardImageUrl(image){
     .replace(/^\/+/, "")
     .replace(/\\/g, "/");
 
-  // 拡張子が無いなら png をまず試す（webpは onerror で拾う）
+  // すでに絶対URLならそのまま
+  if(/^https?:\/\//i.test(raw)) return raw;
+
+  // すでに public/ から始まるならそのまま
+  if(raw.startsWith("public/")) return encodeURI(raw);
+
+  // すでに cards/ から始まるなら public/ を前に足す
+  if(raw.startsWith("cards/")) return encodeURI("public/" + raw);
+
+  // 拡張子が無いならまず png を付ける（webpは onerror 側で試す）
   if(!/\.(png|jpg|jpeg|webp)$/i.test(raw)){
     raw += ".png";
   }
 
-  // すでに絶対URLならそのまま
-  if(/^https?:\/\//i.test(raw)) return raw;
-
-  // "cards/" で始まるならそのまま
-  if(raw.startsWith("cards/")) return encodeURI(raw);
-
-  // それ以外は cards/ 配下に寄せる
-  return encodeURI("cards/" + raw);
+  // CSVの image が "major/08_Strength" みたいに来る前提で
+  return encodeURI("public/cards/" + raw);
 }
+
 
 function handleCardImgError(img){
   const tried = parseInt(img.dataset.tried || "0", 10);
@@ -1453,6 +1457,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
