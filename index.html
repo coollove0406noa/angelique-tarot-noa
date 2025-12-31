@@ -27,7 +27,7 @@
 
   background:
     linear-gradient(rgba(14,11,22,.62), rgba(14,11,22,.62)),
-    url("public/bg/angel_bg1.webp") center / cover no-repeat,
+    url("bg/angel_bg1.webp") center / cover no-repeat,
     var(--bg);
 
   color: var(--text);
@@ -132,7 +132,7 @@
   overflow:hidden;
 
   /* ★裏面画像を表示 */
-  background: url("public/cards/back.png") center / cover no-repeat;
+  background: url("cards/back.png") center / cover no-repeat;
 
   border:1px solid rgba(255,255,255,.18);
   box-shadow: 0 18px 40px rgba(0,0,0,.45);
@@ -150,7 +150,7 @@
   overflow:hidden;
 
   /* ★裏面画像を表示 */
-  background: url("public/cards/back.png") center / cover no-repeat;
+  background: url("cards/back.png") center / cover no-repeat;
 
   border:1px solid rgba(255,255,255,.15);
   left:50%; top:50%;
@@ -602,13 +602,13 @@ body{ color: var(--text); }
   width: var(--deck-w) !important;
   height: var(--deck-h) !important;
   border-radius: var(--deck-radius) !important;
-  background: url("public/cards/back.png") center / cover no-repeat;
+  background: url("cards/back.png") center / cover no-repeat;
 }
 .fly{
   width: calc(var(--deck-w) * 0.72) !important;
   height: calc(var(--deck-h) * 0.72) !important;
   border-radius: calc(var(--deck-radius) * 0.95) !important;
-  background: url("public/cards/back.png") center / cover no-repeat;
+  background: url("cards/back.png") center / cover no-repeat;
 }
 /* ===== シャッフル束を「カード比率(2:3)」で固定して、いびつを解消 ===== */
 :root{
@@ -629,7 +629,7 @@ body{ color: var(--text); }
   height: auto !important;
   aspect-ratio: 2 / 3 !important;          /* ←これが決定打 */
   border-radius: var(--shuffle-r) !important;
-  background: url("public/cards/back.png") center / cover no-repeat !important;
+  background: url("cards/back.png") center / cover no-repeat !important;
 }
 
 /* 飛ぶカード（fly）も同じ比率で統一 */
@@ -638,7 +638,7 @@ body{ color: var(--text); }
   height: auto !important;
   aspect-ratio: 2 / 3 !important;
   border-radius: calc(var(--shuffle-r) * 0.95) !important;
-  background: url("public/cards/back.png") center / cover no-repeat !important;
+  background: url("cards/back.png") center / cover no-repeat !important;
 }
 .deck, .fly{
   background-size: contain !important;  /* ←切れない */
@@ -927,7 +927,7 @@ function applyCreatorMode(){
     document.getElementById("btnUseSaved").addEventListener("click", useSaved);
     document.getElementById("btnClearSaved").addEventListener("click", clearSaved);
     elFile.addEventListener("change", onPickFile);
-const CSV_PATH = "public/data/deck.csv";
+const CSV_PATH = "data/deck.csv"; 
 
 function guessDelimiterFromText(text){
   const firstLine = (text || "").split(/\r?\n/)[0] || "";
@@ -1424,10 +1424,9 @@ function renderCard(card, isReversed, positionLabel){
   `;
 }
 
-// ---- 画像URL（WebP優先）----
 function cardImageUrl(image){
   let raw = (image ?? "").toString().trim();
-  if(!raw) return "public/cards/back.png";
+  if(!raw) return "cards/back.png"; // ← public を外す
 
   raw = raw
     .replace(/^\uFEFF/, "")
@@ -1436,17 +1435,21 @@ function cardImageUrl(image){
     .replace(/^\/+/, "")
     .replace(/\\/g, "/");
 
-  // すでに拡張子があるならそのまま
+  // 拡張子が無いなら png をまず試す（webpは onerror で拾う）
   if(!/\.(png|jpg|jpeg|webp)$/i.test(raw)){
-    // ★WebPで保存したならwebpを付ける
-    raw += ".webp";
+    raw += ".png";
   }
 
+  // すでに絶対URLならそのまま
   if(/^https?:\/\//i.test(raw)) return raw;
-  if(raw.startsWith("public/")) return encodeURI(raw);
-  if(raw.startsWith("cards/")) return encodeURI("public/" + raw);
-  return encodeURI("public/cards/" + raw);
+
+  // "cards/" で始まるならそのまま
+  if(raw.startsWith("cards/")) return encodeURI(raw);
+
+  // それ以外は cards/ 配下に寄せる
+  return encodeURI("cards/" + raw);
 }
+
 function handleCardImgError(img){
   const tried = parseInt(img.dataset.tried || "0", 10);
 
@@ -1484,6 +1487,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
