@@ -799,8 +799,64 @@ body{ color: var(--text); }
   font-weight:600;
   color:rgba(255,255,255,.95);
 }
+/* =========================
+   ✨ カードを引くボタン 強化
+   ========================= */
+#btnDraw{
+  font-size: 17px;                 /* 文字を少し大きく */
+  padding: 16px 26px;              /* 押しやすく */
+  border-radius: 999px;            /* 天使的な丸み */
+  letter-spacing: .08em;
+  font-weight: 800;
 
+  background: linear-gradient(
+    135deg,
+    rgba(240,171,252,.95),
+    rgba(165,180,252,.95)
+  );
 
+  box-shadow:
+    0 14px 30px rgba(165,180,252,.35),
+    0 0 0 1px rgba(255,255,255,.35),
+    inset 0 0 18px rgba(255,255,255,.25);
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* 光がふわっと流れる */
+#btnDraw::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:
+    radial-gradient(circle at 30% 30%,
+      rgba(255,255,255,.45),
+      transparent 60%);
+  opacity:.6;
+  animation: drawGlow 3s ease-in-out infinite;
+  pointer-events:none;
+}
+
+/* ホバー：少し持ち上がる */
+#btnDraw:hover{
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+/* 押した瞬間：沈む */
+#btnDraw:active{
+  transform: translateY(0);
+  box-shadow:
+    0 8px 18px rgba(165,180,252,.35),
+    inset 0 0 12px rgba(255,255,255,.25);
+}
+
+/* 光の呼吸 */
+@keyframes drawGlow{
+  0%,100%{ opacity:.35; }
+  50%{ opacity:.7; }
+}
 
   </style>
 </head>
@@ -1465,6 +1521,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
