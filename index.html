@@ -857,6 +857,56 @@ body{ color: var(--text); }
   0%,100%{ opacity:.35; }
   50%{ opacity:.7; }
 }
+/* ===== 強制適用：カードを引くボタン ===== */
+#btnDraw{
+  font-size: 18px !important;
+  padding: 18px 28px !important;
+  border-radius: 999px !important;
+  letter-spacing: .08em !important;
+  font-weight: 900 !important;
+
+  background: linear-gradient(135deg,
+    rgba(240,171,252,.95),
+    rgba(165,180,252,.95)
+  ) !important;
+
+  box-shadow:
+    0 14px 30px rgba(165,180,252,.35),
+    0 0 0 1px rgba(255,255,255,.35),
+    inset 0 0 18px rgba(255,255,255,.25) !important;
+
+  position: relative !important;
+  overflow: hidden !important;
+  transform: translateY(0) !important;
+  cursor: pointer !important;
+}
+
+/* 光が流れる */
+#btnDraw::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:-40% !important;
+  background: radial-gradient(circle at 30% 30%,
+      rgba(255,255,255,.55),
+      transparent 60%) !important;
+  opacity:.6 !important;
+  animation: drawGlow 3s ease-in-out infinite !important;
+  pointer-events:none !important;
+}
+
+#btnDraw:hover{
+  transform: translateY(-2px) !important;
+  filter: brightness(1.05) !important;
+}
+
+#btnDraw:active{
+  transform: translateY(0) !important;
+}
+
+@keyframes drawGlow{
+  0%,100%{ opacity:.35; }
+  50%{ opacity:.75; }
+}
 
   </style>
 </head>
@@ -1521,6 +1571,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
