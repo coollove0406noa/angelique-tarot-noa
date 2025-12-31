@@ -1392,7 +1392,7 @@ function renderCard(card, isReversed, positionLabel){
 
 function cardImageUrl(image){
   let raw = (image ?? "").toString().trim();
-  if(!raw) return "public/cards/back.png";  // ここはそのまま
+  if(!raw) return "public/cards/back.png";
 
   raw = raw
     .replace(/^\uFEFF/, "")
@@ -1404,20 +1404,15 @@ function cardImageUrl(image){
   // すでに絶対URLならそのまま
   if(/^https?:\/\//i.test(raw)) return raw;
 
-  // すでに public/ から始まるならそのまま
-  if(raw.startsWith("public/")) return encodeURI(raw);
-
-  // すでに cards/ から始まるなら public/ を前に足す
-  if(raw.startsWith("cards/")) return encodeURI("public/" + raw);
-
-  // 拡張子が無いならまず png を付ける（webpは onerror 側で試す）
-  if(!/\.(png|jpg|jpeg|webp)$/i.test(raw)){
-    raw += ".png";
+  // 拡張子が無いなら、まず webp を標準にする（あなたの環境は webp が存在してる）
+  if(!/\.(webp|png|jpg|jpeg)$/i.test(raw)){
+    raw += ".webp";
   }
 
-  // CSVの image が "major/08_Strength" みたいに来る前提で
+  // 重要：表カードは public/cards/ 配下にある前提で固定
   return encodeURI("public/cards/" + raw);
 }
+
 
 
 function handleCardImgError(img){
@@ -1457,6 +1452,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
