@@ -1273,21 +1273,26 @@ elResult.innerHTML = `
     }
 function strengthenCore(core, themes){
   const c = (core ?? "").toString().trim();
+
+  // 55文字以上なら、そのまま返す（完全ノータッチ）
+  if (c.length >= 55) return c;
+
   const t = (themes ?? "").toString().trim();
-
-  // ある程度内容があるなら、そのまま返す（長文化しすぎ防止）
-  if (c.length >= 70) return c;
-
-  // “焦点”は themes の先頭だけ使う（長すぎ防止）
   const focus = t ? t.split("|")[0].trim() : "";
 
-  // 足す文は短く固定（不親切回避＋冗長化回避）
-  const situation = c ? `状況：${c}` : `状況：いまは流れの節目です。`;
-  const focusLine = focus ? `焦点：${focus}` : `焦点：いま大事な感覚を見つけること。`;
-  const direction = `方向性：小さな一歩を一つだけ。`;
+  // 短いときだけ底上げ
+  const base = c || "いまは流れの節目にいます。";
+  const focusLine = focus
+    ? `焦点：${focus}。`
+    : `焦点：いま大切な感覚に気づくこと。`;
+  const direction = `方向性：焦らず、できる一歩を選びましょう。`;
 
-  // 3点セットで返す（短いcoreを必ず補う）
-  return `${situation} ${focusLine} ${direction}`;
+  const out = `${base} ${focusLine} ${direction}`;
+
+  // 念のための保険（これでも短い場合）
+  return out.length >= 55
+    ? out
+    : out + " 心を落ち着けて受け取ってください。";
 }
 
 
@@ -1460,6 +1465,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
