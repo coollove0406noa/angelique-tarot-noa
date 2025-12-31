@@ -1590,20 +1590,23 @@ function strengthenCore(core, themes){
   const t = (themes ?? "").toString().trim();
   const focus = t ? t.split("|")[0].trim() : "";
 
-  // 短いときだけ底上げ
+  // 短いときだけ底上げ（最低40文字を狙う）
   const base = c || "いまは流れの節目にいます。";
   const focusLine = focus
     ? `焦点：${focus}。`
     : `焦点：いま大切な感覚に気づくこと。`;
   const direction = `方向性：焦らず、できる一歩を選びましょう。`;
 
-  const out = `${base} ${focusLine} ${direction}`;
+  let out = `${base} ${focusLine} ${direction}`;
 
-  // 念のための保険（これでも短い場合）
-  return out.length >= 55
-    ? out
-    : out + " 心を落ち着けて受け取ってください。";
+  // 最低40文字の保険（短すぎるカード用）
+  if(out.length < 40){
+    out += " 受け取った合図を大切に。";
+  }
+
+  return out;
 }
+
 
 
     function metaLine(card){
@@ -1635,7 +1638,7 @@ function renderCard(card, isReversed, positionLabel){
   const coreBlock = `
     <div class="line">
       <span class="k">要点：</span>
-     <div class="coreText">${escapeHtml(core || "（要点の文章が未設定です）")}</div>
+     <div class="coreText">${escapeHtml(strengthenCore(core, themes))}</div>
     </div>
   `;
 
@@ -1775,6 +1778,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
