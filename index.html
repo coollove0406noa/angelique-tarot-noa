@@ -1433,7 +1433,12 @@ function handleCardImgError(img){
     img.src = `${base}.${exts[tried]}${query}`;
     return;
   }
-
+　console.warn("[MISSING IMAGE]", {
+    alt: img.alt,
+    lastTried: src,
+    base
+  });
+  
   // 最後の砦：裏面
   img.src = "public/cards/back.png";
 }
@@ -1452,6 +1457,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
