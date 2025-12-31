@@ -1094,43 +1094,9 @@ function normalizeRow(row){
     };
   }
 
-  // 2) Column1〜Column23 で来た場合
-  const getCol = (n) => {
-    const want = "column" + n;
-    const hit = Object.keys(row).find(k => norm(k) === want);
-    return hit ? String(row[hit] ?? "").trim() : "";
-  };
-
-  const idCol = getCol(1);
-  if (!idCol || idCol.toLowerCase() === "id") return null;
-
-  return {
-    id: idCol,
-    arcana: getCol(2),
-    suit: getCol(3),
-    number: getCol(4),
-    name_ja: getCol(5),
-    name_en: getCol(6),
-    element: getCol(7),
-    polarity: getCol(8),
-    yes_no_upright: getCol(9),
-    yes_no_reversed: getCol(10),
-    timing: getCol(11),
-    themes: getCol(12),
-    keywords_upright: getCol(13),
-    keywords_reversed: getCol(14),
-    core_upright: getCol(15),
-    interpretation_upright: getCol(16),
-    angel_upright: getCol(17),
-    action_upright: getCol(18),
-    core_reversed: getCol(19),
-    interpretation_reversed: getCol(20),
-    angel_reversed: getCol(21),
-    action_reversed: getCol(22),
-    image: normalizeImagePath(getCol(23)),
-  };
-}
-
+  // Column形式は使わない
+  return null;
+  
 
 
 function validateCards(list){
@@ -1487,6 +1453,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
