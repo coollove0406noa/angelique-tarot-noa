@@ -1108,7 +1108,6 @@ font:12px/1.2 ui-sans-serif;">
          <div class="fileBox" id="csvArea">
 
           <div>
-            <div style="font-weight:800; font-size:14px; margin-bottom:6px;">/div>
              <input id="csvFile" type="file" accept=".csv,text/csv" />
              <div class="hint">
              
@@ -1160,29 +1159,47 @@ font:12px/1.2 ui-sans-serif;">
 
 
     <div class="panel stage">
-      <div class="stageTop">
-        <div class="stageTitle">
-          <h2>シャッフル</h2>
-          <p>演出 → 引いた結果を表示</p>
-        </div>
-        <div class="small" id="deckInfo">デッキ：未読み込み</div>
-      </div>
+  <div class="stageTop">
+    <div class="stageTitle">
+      <h2>シャッフル</h2>
+      <p>演出 → 引いた結果を表示</p>
+    </div>
+    <div class="small" id="deckInfo">デッキ：未読み込み</div>
+  </div>
 
-      <div class="drawBar">
-  <button id="btnDraw" class="drawBtn">カードを引く</button>
+  <!-- ✅ シャッフル表示 -->
+  <div class="shuffleArea" id="shuffleArea">
+    <div class="deck"></div>
+    <div class="fly"></div><div class="fly"></div><div class="fly"></div>
+    <div class="fly"></div><div class="fly"></div><div class="fly"></div>
+  </div>
 
-  <div class="drawModeInline" aria-label="引き方">
-    <label class="chip">
-      <input type="radio" name="drawMode" value="1" checked />
-      <div><strong>1枚</strong><br><span>ワンオラクル</span></div>
-    </label>
+  <!-- ✅ ボタン＋引き方（シャッフルと結果の間） -->
+  <div class="drawBar">
+    <button id="btnDraw" class="drawBtn">カードを引く</button>
 
-    <label class="chip">
-      <input type="radio" name="drawMode" value="3" />
-      <div><strong>3枚</strong><br><span>過去 / 現在 / 未来</span></div>
-    </label>
+    <div class="drawModeInline" aria-label="引き方">
+      <label class="chip">
+        <input type="radio" name="drawMode" value="1" checked />
+        <div><strong>1枚</strong><br><span>ワンオラクル</span></div>
+      </label>
+
+      <label class="chip">
+        <input type="radio" name="drawMode" value="3" />
+        <div><strong>3枚</strong><br><span>過去 / 現在 / 未来</span></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- ✅ 結果表示 -->
+  <div id="result" style="margin-top:14px;">
+    <div class="empty">
+      ここに結果が出ます。<br>
+      「カードを引く」を押してください。
+    </div>
   </div>
 </div>
+
 
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -1212,9 +1229,14 @@ function applyCreatorMode(){
     const elResult = document.getElementById("result");
 
     document.getElementById("btnDraw").addEventListener("click", onDraw);
-    document.getElementById("btnUseSaved").addEventListener("click", useSaved);
-    document.getElementById("btnClearSaved").addEventListener("click", clearSaved);
-    elFile.addEventListener("change", onPickFile);
+   const btnUseSaved = document.getElementById("btnUseSaved");
+if(btnUseSaved) btnUseSaved.addEventListener("click", useSaved);
+
+const btnClearSaved = document.getElementById("btnClearSaved");
+if(btnClearSaved) btnClearSaved.addEventListener("click", clearSaved);
+
+if(elFile) elFile.addEventListener("change", onPickFile);
+
 const CSV_PATH = "public/data/deck.csv"; 
 
 function guessDelimiterFromText(text){
@@ -1753,6 +1775,7 @@ function escapeHtml(str){
   </script>
 </body>
 </html>
+
 
 
 
