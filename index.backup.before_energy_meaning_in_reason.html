@@ -1,0 +1,2410 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Angelique Tarot (CSV版)</title>
+  <style>
+    :root {
+      --bg: #666132;
+      --text: #ffffff;
+      /* 文字は白系に */
+      --muted: rgba(231, 206, 233, 0.72);
+      /* 補助文字 */
+      --line: rgba(133, 45, 45, 0.14);
+
+      --accent: #f0abfc;
+      /* 天使ピンク */
+      --accent2: #a5b4fc;
+      /* ラベンダー */
+
+      --good: #86efac;
+      --warn: #fde68a;
+      --bad: #fda4af;
+    }
+
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+
+      background:
+        linear-gradient(rgba(14, 11, 22, .62), rgba(14, 11, 22, .62)),
+        url("public/bg/angel_bg1.webp") center / cover no-repeat,
+        var(--bg);
+
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+
+
+
+    .app {
+      width: min(1100px, 100%)
+    }
+
+    header {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: .04em;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 22px;
+      line-height: 1.4;
+    }
+
+    .panel {
+      background: rgba(20, 16, 30, .62);
+      /* 半透明の闇 */
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 18px;
+      padding: 14px;
+
+      box-shadow:
+        0 14px 40px rgba(0, 0, 0, .45),
+        inset 0 0 0 1px rgba(255, 255, 255, .12);
+    }
+
+
+    .topGrid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .cardsGrid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .cardsGrid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .cardsGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .cardImg {
+        width: 160px;
+      }
+    }
+
+
+    .drawMode {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .12);
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .12s ease, background .12s ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .08)
+    }
+
+    .chip input {
+      accent-color: var(--accent);
+      margin: 0
+    }
+
+    .chip strong {
+      font-size: 13px
+    }
+
+    .chip span {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .btnRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(167, 139, 250, .9), rgba(96, 165, 250, .9));
+      font-weight: 700;
+      letter-spacing: .02em;
+      box-shadow: 0 10px 25px rgba(96, 165, 250, .14);
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: saturate(1.05)
+    }
+
+    button.secondary {
+      background: linear-gradient(135deg,
+          rgba(240, 171, 252, .95),
+          rgba(165, 180, 252, .95));
+      box-shadow:
+        0 10px 30px rgba(165, 180, 252, .25),
+        inset 0 0 0 1px rgba(255, 255, 255, .25);
+    }
+
+    button.secondary:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, .09)
+    }
+
+    .status {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stage {
+      margin-top: 12px;
+      padding: 14px;
+    }
+
+    .stageTop {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .stageTitle {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stageTitle h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .stageTitle p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .shuffleArea {
+      position: relative;
+      height: 140px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, .25), rgba(0, 0, 0, .15));
+      border: 1px solid rgba(255, 255, 255, .10);
+      overflow: hidden;
+    }
+
+    .deck {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 200px;
+      height: 200px;
+      transform: translate(-50%, -50%);
+      border-radius: 30px;
+      overflow: hidden;
+
+      /* ★裏面画像を表示 */
+      background: url("public/cards/back.png") center / cover no-repeat;
+
+      border: 1px solid rgba(255, 255, 255, .18);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+    }
+
+    /* 文字ロゴは消したいならこのまま削除してOK */
+    .deck::after {
+      content: "";
+    }
+
+    /* 飛ぶカード（裏面） */
+    .fly {
+      position: absolute;
+      width: 130px;
+      height: 185px;
+      border-radius: 20px;
+      overflow: hidden;
+
+      /* ★裏面画像を表示 */
+      background: url("public/cards/back.png") center / cover no-repeat;
+
+      border: 1px solid rgba(255, 255, 255, .15);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      box-shadow: 0 16px 30px rgba(0, 0, 0, .35);
+    }
+
+    .shuffling .deck {
+      animation: deckBreath 1.8s ease-in-out infinite;
+    }
+
+    @keyframes deckBreath {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, .45),
+          0 0 22px rgba(200, 160, 255, .35);
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.05) rotate(2deg);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, .55),
+          0 0 38px rgba(160, 200, 255, .55);
+      }
+    }
+
+
+
+    .cardsGrid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .cardsGrid.single {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    .cardsGrid.three {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      /* 余白少なめ */
+      align-items: start;
+      justify-items: center;
+    }
+
+    /* 真ん中だけ少し強調（好みで） */
+    .cardsGrid.three .tcard:nth-child(2).cardImg {
+      width: 280px;
+      /* ← 基本サイズ */
+      max-width: 90%;
+    }
+
+
+    @media (max-width: 520px) {
+      .cardImg {
+        width: 170px;
+      }
+
+      .cardsGrid.three .tcard:nth-child(2) .cardImg {
+        width: 261 0px;
+      }
+    }
+
+    /* === 文字の可読性を上げる魔法 === */
+    body,
+    .panel,
+    .tcard,
+    .stage,
+    header,
+    .status,
+    .small,
+    .empty {
+      text-shadow:
+        0 1px 2px rgba(0, 0, 0, .55),
+        0 0 6px rgba(0, 0, 0, .35);
+    }
+
+    .tcard {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .04));
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow:
+        0 12px 34px rgba(0, 0, 0, .35),
+        0 0 0 1px rgba(255, 255, 255, .12),
+        0 0 28px rgba(240, 171, 252, .15);
+      /* 光 */
+    }
+
+    .tcardHeader {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 12px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, .10);
+      background: rgba(0, 0, 0, .18);
+    }
+
+    .tcardTitle {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .tcardTitle .pos {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .78);
+      letter-spacing: .06em;
+    }
+
+    .tcardTitle .name {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .tcardTitle .sub {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .badge {
+      align-self: flex-start;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .15);
+      background: rgba(255, 255, 255, .06);
+      color: rgba(255, 255, 255, .85);
+      white-space: nowrap;
+    }
+
+    .badge.up {
+      border-color: rgba(34, 197, 94, .35);
+      background: rgba(34, 197, 94, .12)
+    }
+
+    .badge.rev {
+      border-color: rgba(245, 158, 11, .35);
+      background: rgba(245, 158, 11, .12)
+    }
+
+    .tcardVisual {
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* 結果カード（tcard）内の画像 */
+    /* 結果カード（tcard）内の画像 */
+    /* === ②-1 結果カード画像を大きく === */
+    /* ===== cardImg はここで一括管理（最後に置く） ===== */
+    .cardImg {
+      width: 340px;
+      /* 3枚すべて大きく */
+      max-width: 92%;
+      height: auto;
+      display: block;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      box-shadow: 0 22px 46px rgba(0, 0, 0, .45);
+    }
+
+    .cardImg.reversed {
+      transform: rotate(180deg);
+    }
+
+    /* 3枚引きレイアウト */
+    .cardsGrid.three {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      justify-items: center;
+      align-items: start;
+    }
+
+    /* 真ん中だけ“さらに”強調（任意。要らなければ消してOK） */
+    .cardsGrid.three .tcard:nth-child(2) .cardImg {
+      width: 360px;
+    }
+
+    /* 1枚引き */
+    .cardsGrid.single {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    /* スマホ調整 */
+    @media (max-width: 480px) {
+      .cardsGrid.three {
+        gap: 10px;
+      }
+
+      .cardImg {
+        width: 20vw;
+      }
+
+      /* 3枚横で収まる */
+      .cardsGrid.three .tcard:nth-child(2) .cardImg {
+        width: 34vw;
+      }
+    }
+
+
+
+    .face {
+      width: 128px;
+      height: 188px;
+      border-radius: 18px;
+      background:
+        radial-gradient(120px 90px at 30% 20%, rgba(167, 139, 250, .30), transparent 60%),
+        radial-gradient(140px 110px at 70% 80%, rgba(96, 165, 250, .22), transparent 65%),
+        linear-gradient(180deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .05));
+      border: 1px solid rgba(255, 255, 255, .18);
+      box-shadow: 0 16px 30px rgba(0, 0, 0, .40);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s ease;
+    }
+
+    .face .mono {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, .7);
+      letter-spacing: .1em;
+    }
+
+    .face .big {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      color: rgba(255, 255, 255, .86);
+      text-align: center;
+      padding: 0 12px;
+      line-height: 1.25;
+    }
+
+    .face.reversed {
+      transform: rotate(180deg);
+    }
+
+    .tcardBody {
+      padding: 0 12px 12px;
+      color: rgba(255, 255, 255, .90);
+      font-size: 13px;
+      line-height: 1.62;
+    }
+
+    .line {
+      padding: 10px 0;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .line:first-child {
+      border-top: 0
+    }
+
+    .k {
+      color: rgba(255, 255, 255, .90);
+      font-weight: 900;
+      margin-right: 6px;
+    }
+
+    /* Keyword chips */
+    .kwWrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .kw {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      background: rgba(255, 255, 255, .06);
+      color: rgba(255, 255, 255, .88);
+      white-space: nowrap;
+    }
+
+    .kw.rev {
+      border-color: rgba(245, 158, 11, .25);
+      background: rgba(245, 158, 11, .10)
+    }
+
+    .kw.up {
+      border-color: rgba(96, 165, 250, .25);
+      background: rgba(96, 165, 250, .10)
+    }
+
+    details {
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(0, 0, 0, .14);
+      overflow: hidden;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 10px 12px;
+      color: rgba(255, 255, 255, .88);
+      font-weight: 800;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .detailsBody {
+      padding: 0 12px 12px;
+      color: rgba(255, 255, 255, .86);
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .note {
+      margin-top: 10px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(245, 158, 11, .25);
+      background: rgba(245, 158, 11, .10);
+      color: rgba(255, 255, 255, .88);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .empty {
+      padding: 14px;
+      border: 1px dashed rgba(255, 255, 255, .18);
+      border-radius: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      background: rgba(0, 0, 0, .12);
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ===== Yes / No 表示を大きくする ===== */
+    .ynRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .yn {
+      font-size: 16px;
+      /* ← 大きさ（ここを18や20にしてもOK） */
+      font-weight: 900;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, .4);
+      background: rgba(255, 255, 255, .15);
+    }
+
+    .yn.up {
+      border-color: #4ade80;
+      background: rgba(74, 222, 128, .25);
+    }
+
+    .yn.rev {
+      border-color: #facc15;
+      background: rgba(250, 204, 21, .25);
+    }
+
+    .cardWrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 18px;
+    }
+
+    /* 1枚引きの表示（上の1枚だけ出るカード） */
+    .cardWrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 18px;
+    }
+
+    .cardFrame {
+      width: min(360px, 78vw);
+      /* 中央で大きめ */
+    }
+
+    #tarotCard.tarotCard {
+      width: 100%;
+      height: auto;
+      display: block;
+      aspect-ratio: 2 / 3;
+      /* 崩れ防止 */
+      object-fit: cover;
+      border-radius: 18px;
+      box-shadow: 0 16px 30px rgba(0, 0, 0, .40);
+      border: 1px solid rgba(255, 255, 255, .18);
+    }
+
+    /* 逆位置：回転だけでOK（translateは不要） */
+    #tarotCard.tarotCard.reversed {
+      transform: rotate(180deg);
+    }
+
+    /* === 強制テキスト可視化（応急） === */
+    /* 応急の強制は最小限に */
+    body {
+      color: var(--text);
+    }
+
+
+    /* ===== 表示レイアウト（最終決定版） ===== */
+    .cardsGrid {
+      margin-top: 14px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .cardsGrid.single {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    .cardsGrid.three {
+      grid-template-columns: repeat(3, 1fr);
+      justify-items: center;
+      align-items: start;
+    }
+
+    /* 画像サイズ（全体） */
+    .cardImg {
+      width: min(360px, 28vw);
+      /* 3枚とも大きい */
+      max-width: 92%;
+      height: auto;
+      display: block;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      box-shadow:
+        0 18px 44px rgba(0, 0, 0, .45),
+        0 0 36px rgba(240, 171, 252, .12);
+    }
+
+    .cardImg.reversed {
+      transform: rotate(180deg);
+    }
+
+    /* 真ん中だけほんの少し強調（不要なら削除OK） */
+    .cardsGrid.three .tcard:nth-child(2) .cardImg {
+      width: min(400px, 32vw);
+    }
+
+    /* モバイル */
+    @media (max-width: 480px) {
+      .cardsGrid.three {
+        gap: 10px;
+      }
+
+      .cardImg {
+        width: 30vw;
+      }
+
+      .cardsGrid.three .tcard:nth-child(2) .cardImg {
+        width: 34vw;
+      }
+    }
+
+    /* === シャッフル：光のオーラ === */
+    .shuffleArea::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 50% 50%,
+          rgba(200, 160, 255, .35),
+          rgba(160, 200, 255, .18),
+          transparent 60%);
+      opacity: .6;
+      animation: auraPulse 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes auraPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: .45
+      }
+
+      50% {
+        transform: scale(1.08);
+        opacity: .75
+      }
+    }
+
+    /* === 飛ぶカードの動きを優雅にする === */
+    .shuffling .fly {
+      animation-timing-function: cubic-bezier(.22, .61, .36, 1);
+    }
+
+    /* ===== サイズ調整（ここだけ触ればOK）===== */
+    :root {
+      --deck-size: 240px;
+      /* シャッフル中央の束（大きく） */
+      --fly-w: 160px;
+      /* 飛ぶカード幅（大きく） */
+      --fly-h: 230px;
+      /* 飛ぶカード高さ（大きく） */
+
+      --result-w-1: min(300px, 78vw);
+      /* 1枚引きの結果（少し小さく） */
+      --result-w-3: min(240px, 26vw);
+      /* 3枚引きの結果（小さく） */
+      --result-w-3-mid: min(260px, 28vw);
+      /* 真ん中だけ少し強調 */
+    }
+
+    /* シャッフルエリア高さも少し上げる（大きくした分の余裕） */
+    .shuffleArea {
+      height: 220px;
+    }
+
+    /* 中央デッキ（束） */
+    .deck {
+      width: var(--deck-size) !important;
+      height: var(--deck-size) !important;
+      border-radius: 28px;
+    }
+
+    /* 飛ぶカード */
+    .fly {
+      width: var(--fly-w) !important;
+      height: var(--fly-h) !important;
+      border-radius: 22px;
+    }
+
+    /* 結果：3枚引き（いま cardImg が大きすぎるので下げる） */
+    .cardsGrid.three .cardImg {
+      width: var(--result-w-3) !important;
+      max-width: 100%;
+    }
+
+    /* 結果：真ん中だけ少し強調（任意） */
+    .cardsGrid.three .tcard:nth-child(2) .cardImg {
+      width: var(--result-w-3-mid) !important;
+    }
+
+    /* 結果：1枚引き（#tarotCard は今使ってないけど保険で） */
+    .cardsGrid.single .cardImg {
+      width: var(--result-w-1) !important;
+      max-width: 100%;
+    }
+
+    /* スマホ：3枚横並びの崩れ防止 */
+    @media (max-width: 480px) {
+      .shuffleArea {
+        height: 200px;
+      }
+
+      :root {
+        --result-w-3: 28vw;
+        --result-w-3-mid: 32vw;
+      }
+    }
+
+    /* ===== シャッフル表示エリア：デッキサイズに合わせて自動で広げる ===== */
+    :root {
+      /* すでに入れてるならここは合わせるだけでOK */
+      --deck-size: 240px;
+    }
+
+    /* deck が大きくなっても切れない高さにする */
+    .shuffleArea {
+      height: calc(var(--deck-size) + 80px) !important;
+      /* ← 余白ぶん増やす */
+      min-height: 220px;
+      overflow: hidden;
+      /* 演出を枠内に収めたいなら hidden のままでOK */
+    }
+
+    /* スマホは少し控えめに */
+    @media (max-width: 520px) {
+      .shuffleArea {
+        height: calc(var(--deck-size) + 60px) !important;
+        min-height: 200px;
+      }
+    }
+
+    /* クリックが吸われるのを防ぐ（超重要） */
+    .shuffleArea,
+    .shuffleArea * {
+      pointer-events: none;
+    }
+
+    /* ボタンは必ず押せるようにする */
+    #btnDraw {
+      pointer-events: auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    :root {
+      --deck-w: 220px;
+      /* シャッフル束：幅 */
+      --deck-h: 320px;
+      /* シャッフル束：高さ（カード比率に） */
+      --deck-radius: 22px;
+      /* 角丸 */
+    }
+
+    /* シャッフルの箱を「カード高さ + 余白」に */
+    .shuffleArea {
+      height: calc(var(--deck-h) + 80px) !important;
+      min-height: calc(var(--deck-h) + 80px) !important;
+      overflow: hidden;
+    }
+
+    .deck {
+      width: var(--deck-w) !important;
+      height: var(--deck-h) !important;
+      border-radius: var(--deck-radius) !important;
+      background: url("public/cards/back.png") center / cover no-repeat;
+    }
+
+    .fly {
+      width: calc(var(--deck-w) * 0.72) !important;
+      height: calc(var(--deck-h) * 0.72) !important;
+      border-radius: calc(var(--deck-radius) * 0.95) !important;
+      background: url("public/cards/back.png") center / cover no-repeat;
+    }
+
+    /* ===== シャッフル束を「カード比率(2:3)」で固定して、いびつを解消 ===== */
+    :root {
+      --shuffle-w: 220px;
+      /* シャッフルカードの幅（大きさはここ） */
+      --shuffle-r: 22px;
+      /* 角丸 */
+    }
+
+    /* 箱もカード高さに合わせて確保（切れ防止） */
+    .shuffleArea {
+      height: calc(var(--shuffle-w) * 1.5 + 90px) !important;
+      /* 1.5 = 3/2 */
+      min-height: calc(var(--shuffle-w) * 1.5 + 90px) !important;
+      overflow: hidden;
+    }
+
+    /* 中央の束（deck） */
+    .deck {
+      width: var(--shuffle-w) !important;
+      height: auto !important;
+      aspect-ratio: 2 / 3 !important;
+      /* ←これが決定打 */
+      border-radius: var(--shuffle-r) !important;
+      background: url("public/cards/back.png") center / cover no-repeat !important;
+    }
+
+    /* 飛ぶカード（fly）も同じ比率で統一 */
+    .fly {
+      width: calc(var(--shuffle-w) * 0.78) !important;
+      height: auto !important;
+      aspect-ratio: 2 / 3 !important;
+      border-radius: calc(var(--shuffle-r) * 0.95) !important;
+      background: url("public/cards/back.png") center / cover no-repeat !important;
+    }
+
+    .deck,
+    .fly {
+      background-size: contain !important;
+      /* ←切れない */
+      background-color: rgba(0, 0, 0, .18);
+      /* 余白が出た時も綺麗 */
+    }
+
+    /* ================================
+   📱 Mobile最適化：シャッフル＆3枚引き
+   ================================ */
+
+    /* まずはPC/共通の基準（触るのはここだけでもOK） */
+    :root {
+      --shuffle-w: 220px;
+      /* PCのシャッフル幅 */
+    }
+
+    /* 3枚引き：重なりの原因は「カードが大きすぎ」or「tcardが伸びてる」なので、
+   グリッドの各列を“必ず均等”にして、画像幅をvwで固定 */
+    .cardsGrid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 12px !important;
+    }
+
+    .cardsGrid.three .tcard {
+      width: 100%;
+      min-width: 0;
+      /* ← これがないと中身で横に広がって重なることがある */
+    }
+
+    .cardsGrid.three .cardImg {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto;
+    }
+
+    /* ---- モバイル本番調整 ---- */
+    @media (max-width: 520px) {
+
+      /* シャッフルカードが大きすぎる問題 */
+      :root {
+        --shuffle-w: 150px;
+        /* ←携帯は小さめに */
+      }
+
+      /* シャッフル箱も連動して縮める */
+      .shuffleArea {
+        height: calc(var(--shuffle-w) * 1.5 + 60px) !important;
+        min-height: calc(var(--shuffle-w) * 1.5 + 60px) !important;
+      }
+
+      /* シャッフル束＆飛ぶカード：比率は維持したまま縮小 */
+      .deck {
+        width: var(--shuffle-w) !important;
+        aspect-ratio: 2 / 3 !important;
+      }
+
+      .fly {
+        width: calc(var(--shuffle-w) * 0.78) !important;
+        aspect-ratio: 2 / 3 !important;
+      }
+
+      /* 3枚引き：絶対に重ならないサイズ設計（3枚=各1/3幅） */
+      .cardsGrid.three {
+        gap: 8px !important;
+      }
+
+      /* 画像をvw基準で固定（画面幅に対して常に収まる） */
+      .cardsGrid.three .cardImg {
+        width: 28vw !important;
+        /* ← ここを 26〜30 で調整 */
+        max-width: 28vw !important;
+      }
+
+      /* 真ん中だけ少し強調したい場合（任意。不要なら削除OK） */
+      .cardsGrid.three .tcard:nth-child(2) .cardImg {
+        width: 30vw !important;
+        max-width: 30vw !important;
+      }
+
+      /* カード枠（tcard）自体が横に広がらないように保険 */
+      .cardsGrid.three .tcard {
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+    }
+
+    /* =====================================
+   📱 Mobileでも3枚横並びを守る（重なり解消）
+   ===================================== */
+    @media (max-width: 520px) {
+
+      /* 3列を維持しつつ“はみ出し禁止”の土台 */
+      .cardsGrid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        align-items: start;
+      }
+
+      /* これが超重要：中身が原因で列幅より広がるのを止める */
+      .tcard,
+      .tcardHeader,
+      .tcardTitle,
+      .tcardBody {
+        min-width: 0 !important;
+      }
+
+      .tcard {
+        width: 100% !important;
+        overflow: hidden !important;
+        /* 隣に乗り上げるのを物理的に防ぐ */
+      }
+
+      /* 画像は列幅に100%フィット（=重なりの起点を消す） */
+      .cardsGrid.three .cardImg {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+      }
+
+      /* ヘッダーは“縦積み”にして横の突き抜けを防ぐ（横並び表示は維持） */
+      .tcardHeader {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+        padding: 10px 10px 8px !important;
+      }
+
+      /* バッジも折り返し可に */
+      .badge {
+        font-size: 11px !important;
+        padding: 5px 8px !important;
+        max-width: 100% !important;
+        white-space: normal !important;
+      }
+
+      /* YES/NO ピルが主犯：小さく＆折り返し＆列から出ない */
+      .ynRow {
+        margin-top: 8px !important;
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+      }
+
+      .yn {
+        font-size: 12px !important;
+        padding: 6px 8px !important;
+        line-height: 1.2 !important;
+        max-width: 100% !important;
+        white-space: normal !important;
+        /* ←折り返す */
+        overflow-wrap: anywhere !important;
+        /* ←保留/日本語でも突き抜けない */
+      }
+
+      /* 文字量も少し締めて“3枚横”の品を保つ */
+      .tcardBody {
+        padding: 0 10px 10px !important;
+        font-size: 12px !important;
+        line-height: 1.55 !important;
+      }
+
+      .tcardTitle .name {
+        font-size: 13px !important;
+      }
+
+      .tcardTitle .sub {
+        font-size: 11px !important;
+      }
+
+      /* キーワードチップが横に長いと押し出すので少し小さく */
+      .kw {
+        font-size: 11px !important;
+        padding: 5px 8px !important;
+        max-width: 100% !important;
+      }
+    }
+
+    .coreText {
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.7;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .95);
+    }
+
+    /* =========================
+   ✨ カードを引くボタン 強化
+   ========================= */
+    #btnDraw {
+      font-size: 17px;
+      /* 文字を少し大きく */
+      padding: 16px 26px;
+      /* 押しやすく */
+      border-radius: 999px;
+      /* 天使的な丸み */
+      letter-spacing: .08em;
+      font-weight: 800;
+
+      background: linear-gradient(135deg,
+          rgba(240, 171, 252, .95),
+          rgba(165, 180, 252, .95));
+
+      box-shadow:
+        0 14px 30px rgba(165, 180, 252, .35),
+        0 0 0 1px rgba(255, 255, 255, .35),
+        inset 0 0 18px rgba(255, 255, 255, .25);
+
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 光がふわっと流れる */
+    #btnDraw::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 30% 30%,
+          rgba(255, 255, 255, .45),
+          transparent 60%);
+      opacity: .6;
+      animation: drawGlow 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    /* ホバー：少し持ち上がる */
+    #btnDraw:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    /* 押した瞬間：沈む */
+    #btnDraw:active {
+      transform: translateY(0);
+      box-shadow:
+        0 8px 18px rgba(165, 180, 252, .35),
+        inset 0 0 12px rgba(255, 255, 255, .25);
+    }
+
+    /* 光の呼吸 */
+    @keyframes drawGlow {
+
+      0%,
+      100% {
+        opacity: .35;
+      }
+
+      50% {
+        opacity: .7;
+      }
+    }
+
+    /* ===== 強制適用：カードを引くボタン ===== */
+    #btnDraw {
+      font-size: 18px !important;
+      padding: 18px 28px !important;
+      border-radius: 999px !important;
+      letter-spacing: .08em !important;
+      font-weight: 900 !important;
+
+      background: linear-gradient(135deg,
+          rgba(240, 171, 252, .95),
+          rgba(165, 180, 252, .95)) !important;
+
+      box-shadow:
+        0 14px 30px rgba(165, 180, 252, .35),
+        0 0 0 1px rgba(255, 255, 255, .35),
+        inset 0 0 18px rgba(255, 255, 255, .25) !important;
+
+      position: relative !important;
+      overflow: hidden !important;
+      transform: translateY(0) !important;
+      cursor: pointer !important;
+    }
+
+    /* 光が流れる */
+    #btnDraw::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: -40% !important;
+      background: radial-gradient(circle at 30% 30%,
+          rgba(255, 255, 255, .55),
+          transparent 60%) !important;
+      opacity: .6 !important;
+      animation: drawGlow 3s ease-in-out infinite !important;
+      pointer-events: none !important;
+    }
+
+    #btnDraw:hover {
+      transform: translateY(-2px) !important;
+      filter: brightness(1.05) !important;
+    }
+
+    #btnDraw:active {
+      transform: translateY(0) !important;
+    }
+
+    @keyframes drawGlow {
+
+      0%,
+      100% {
+        opacity: .35;
+      }
+
+      50% {
+        opacity: .75;
+      }
+    }
+
+    /* ================================
+   ✨ Angel Button: gold + glow + wing-ish
+   ================================ */
+    #btnDraw {
+      position: relative;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      min-width: 280px !important;
+      padding: 18px 34px !important;
+      font-size: 18px !important;
+      font-weight: 900;
+      letter-spacing: .06em;
+
+      color: rgba(40, 28, 10, .92);
+      border: 1px solid rgba(255, 255, 255, .35) !important;
+
+      /* ベージュ系ゴールド（上品） */
+      background: linear-gradient(135deg,
+          #f6e7c6 0%,
+          #efd39a 28%,
+          #d7b36a 55%,
+          #f3e0b8 100%) !important;
+
+      border-radius: 999px !important;
+      /* 天使っぽい柔らかさ */
+      box-shadow:
+        0 14px 30px rgba(0, 0, 0, .28),
+        0 0 0 1px rgba(255, 255, 255, .18) inset,
+        0 10px 26px rgba(220, 180, 90, .22);
+
+      transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+      overflow: visible;
+    }
+
+    /* ふわっと光るオーラ（常時） */
+    #btnDraw::before {
+      content: "";
+      position: absolute;
+      inset: -18px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 30% 35%, rgba(255, 245, 214, .65), transparent 55%),
+        radial-gradient(circle at 70% 65%, rgba(255, 214, 140, .38), transparent 60%);
+      filter: blur(10px);
+      opacity: .55;
+      animation: angelPulse 2.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    /* “羽感”の左右フレア（画像なしで羽っぽく） */
+    #btnDraw::after {
+      content: "";
+      position: absolute;
+      left: -26px;
+      right: -26px;
+      top: 50%;
+      height: 34px;
+      transform: translateY(-50%);
+      background:
+        radial-gradient(26px 18px at 0% 50%, rgba(255, 255, 255, .55), transparent 70%),
+        radial-gradient(26px 18px at 100% 50%, rgba(255, 255, 255, .55), transparent 70%),
+        linear-gradient(90deg, transparent, rgba(255, 255, 255, .22), transparent);
+      filter: blur(1px);
+      opacity: .55;
+      pointer-events: none;
+    }
+
+    /* ホバーで上品に浮く */
+    #btnDraw:hover {
+      transform: translateY(-1px) scale(1.01);
+      filter: saturate(1.03);
+      box-shadow:
+        0 18px 38px rgba(0, 0, 0, .32),
+        0 0 0 1px rgba(255, 255, 255, .22) inset,
+        0 0 26px rgba(255, 220, 150, .35);
+    }
+
+    /* 押した瞬間に“キラッ” */
+    #btnDraw:active {
+      transform: translateY(0px) scale(.99);
+      box-shadow:
+        0 12px 24px rgba(0, 0, 0, .28),
+        0 0 0 1px rgba(255, 255, 255, .20) inset,
+        0 0 34px rgba(255, 245, 210, .55);
+    }
+
+    /* キーボード操作でも光る */
+    #btnDraw:focus-visible {
+      outline: none;
+      box-shadow:
+        0 18px 38px rgba(0, 0, 0, .32),
+        0 0 0 3px rgba(255, 245, 214, .55),
+        0 0 40px rgba(255, 220, 150, .35);
+    }
+
+    @keyframes angelPulse {
+
+      0%,
+      100% {
+        opacity: .45;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .78;
+        transform: scale(1.02);
+      }
+    }
+
+    /* 公開用：上の操作パネルを全消し */
+    .topGrid {
+      display: none !important;
+    }
+
+    /* シャッフルと結果の間に置く操作バー */
+    .drawBar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 14px;
+      margin-bottom: 10px;
+    }
+
+    /* 引き方を横並び中央に */
+    .drawModeInline {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 「カードを引く」ボタン：中央固定＆上品に */
+    .drawBtn {
+      min-width: min(520px, 92vw);
+      padding: 16px 22px;
+      border-radius: 999px;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, .35);
+      color: rgba(40, 28, 10, .95);
+
+      /* ベージュ系ゴールド */
+      background: linear-gradient(135deg,
+          #f7e7c2 0%,
+          #e6c37a 35%,
+          #f6e4b6 60%,
+          #cfa24f 100%);
+
+      box-shadow:
+        0 14px 34px rgba(0, 0, 0, .35),
+        0 0 26px rgba(255, 224, 160, .28);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ふわっと光る */
+    .drawBtn::before {
+      content: "";
+      position: absolute;
+      inset: -60%;
+      background: radial-gradient(circle at 30% 30%,
+          rgba(255, 255, 255, .75),
+          rgba(255, 255, 255, .15),
+          transparent 60%);
+      transform: rotate(12deg);
+      animation: drawShine 2.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes drawShine {
+      0% {
+        transform: translateX(-14%) rotate(12deg);
+        opacity: .35;
+      }
+
+      50% {
+        transform: translateX(12%) rotate(12deg);
+        opacity: .75;
+      }
+
+      100% {
+        transform: translateX(-14%) rotate(12deg);
+        opacity: .35;
+      }
+    }
+
+    .drawBtn:hover {
+      transform: translateY(-1px);
+      filter: saturate(1.05);
+    }
+
+    .drawBtn:active {
+      transform: translateY(0px) scale(.99);
+    }
+
+    /* =========================================
+       ✨ Cinematic UI CSS Port 
+       ========================================= */
+    :root {
+      --bg: #666132;
+      --text: #ffffff;
+      /* 文字は白系に */
+      --muted: rgba(231, 206, 233, 0.72);
+      /* 補助文字 */
+      --line: rgba(133, 45, 45, 0.14);
+      --accent: #f0abfc;
+      /* 天使ピンク */
+      --accent2: #a5b4fc;
+      /* ラベンダー */
+      --good: #86efac;
+      --warn: #fde68a;
+      --bad: #fda4af;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+      background:
+        linear-gradient(rgba(14, 11, 22, .62), rgba(14, 11, 22, .62)),
+        url("public/bg/angel_bg1.webp") center / cover no-repeat,
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .panel {
+      background: rgba(20, 16, 30, .62);
+      /* 半透明の闇 */
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow:
+        0 14px 40px rgba(0, 0, 0, .45),
+        inset 0 0 0 1px rgba(255, 255, 255, .12);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .12);
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .12s ease, background .12s ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .chip input {
+      accent-color: var(--accent);
+      margin: 0;
+    }
+
+    .chip strong {
+      font-size: 13px;
+    }
+
+    .chip span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    body,
+    .panel,
+    .tcard,
+    .stage,
+    header,
+    .status,
+    .small,
+    .empty {
+      text-shadow:
+        0 1px 2px rgba(0, 0, 0, .55),
+        0 0 6px rgba(0, 0, 0, .35);
+    }
+
+    /* Summary Block */
+    .summaryCard {
+      background: rgba(255, 255, 255, .05);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .summaryTitle {
+      font-weight: bold;
+      color: var(--accent, #f0abfc);
+      margin-bottom: 4px;
+    }
+
+    .summaryText {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .85);
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="position:fixed;bottom:12px;right:12px;z-index:9999;
+background:#000a;border:1px solid #fff3;color:#fff;padding:8px 10px;border-radius:10px;
+font:12px/1.2 ui-sans-serif;">
+    VERSION: 2025-12-24-1
+  </div>
+
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>Angelique Tarot</h1>
+        <p>キーワード10個 / （コア・注釈・天使）/ Yes・No（正逆）を表示。</p>
+      </div>
+    </header>
+
+    <div class="panel topGrid">
+      <div>
+        <div id="creatorOnly"></div>
+        <div class="fileBox" id="csvArea">
+
+          <div>
+            <input id="csvFile" type="file" accept=".csv,text/csv" />
+            <div class="hint">
+
+            </div>
+          </div>
+          <div style="margin-left:auto; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="secondary" id="btnUseSaved">保存済みCSVを使う</button>
+            <button class="secondary" id="btnClearSaved">保存を消す</button>
+          </div>
+        </div>
+        <div class="status" id="status"> Angelique Tarot はすぐに使えます ✨</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-weight:800; font-size:14px;">② 引き方を選ぶ</div>
+
+        <div class="drawMode">
+          <label class="chip">
+            <input type="radio" name="drawMode" value="1" checked />
+            <div>
+              <strong>1枚（ワンオラクル）</strong><br />
+              <span>いまのメッセージ</span>
+            </div>
+          </label>
+
+          <label class="chip">
+            <input type="radio" name="drawMode" value="3" />
+            <div>
+              <strong>3枚（深掘り）</strong><br />
+              <span>過去 / 現在 / 未来</span>
+            </div>
+          </label>
+          <label class="chip" style="cursor:text;">
+            <div>
+              <strong>あなたの生年月日</strong><br />
+              <input type="date" id="userBirthdate"
+                style="background:transparent; border:none; color:inherit; outline:none; font-family:inherit; margin-top:2px;" />
+            </div>
+          </label>
+          <label class="chip" style="cursor:text;">
+            <div>
+              <strong>お相手の生年月日</strong><br />
+              <input type="date" id="partnerBirthdate"
+                style="background:transparent; border:none; color:inherit; outline:none; font-family:inherit; margin-top:2px;" />
+            </div>
+          </label>
+        </div>
+
+        <div class="btnRow">
+
+        </div>
+
+        <div class="small">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <div class="panel stage">
+    <div class="stageTop">
+      <div class="stageTitle">
+        <h2>シャッフル</h2>
+        <p>演出 → 引いた結果を表示</p>
+      </div>
+      <div class="small" id="deckInfo">デッキ：未読み込み</div>
+    </div>
+
+    <!-- ✅ シャッフル表示 -->
+    <div class="shuffleArea" id="shuffleArea">
+      <div class="deck"></div>
+      <div class="fly"></div>
+      <div class="fly"></div>
+      <div class="fly"></div>
+      <div class="fly"></div>
+      <div class="fly"></div>
+      <div class="fly"></div>
+    </div>
+
+    <!-- ✅ ボタン＋引き方（シャッフルと結果の間） -->
+    <div class="drawBar">
+      <button id="btnDraw" class="drawBtn">カードを引く</button>
+
+      <div class="drawModeInline" aria-label="引き方">
+        <label class="chip">
+          <input type="radio" name="drawMode" value="1" checked />
+          <div><strong>1枚</strong><br><span>ワンオラクル</span></div>
+        </label>
+
+        <label class="chip">
+          <input type="radio" name="drawMode" value="3" />
+          <div><strong>3枚</strong><br><span>過去 / 現在 / 未来</span></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- ✅ 結果表示 -->
+    <div id="result" style="margin-top:14px;">
+      <div class="empty">
+        ここに結果が出ます。<br>
+        「カードを引く」を押してください。
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+    const STORAGE_KEY = "angelique_tarot_csv_rows_v2";
+    let cards = [];
+    const IS_CREATOR = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+
+
+    function applyCreatorMode() {
+      const creator = document.getElementById("creatorOnly");
+      const csvArea = document.getElementById("csvArea");
+
+      if (!IS_CREATOR) {
+        if (creator) creator.style.display = "none";
+        if (csvArea) csvArea.style.display = "none"; // ★ CSV UI全体を隠す
+      }
+    }
+
+
+
+
+    const elFile = document.getElementById("csvFile");
+    const elStatus = document.getElementById("status");
+    const elDeckInfo = document.getElementById("deckInfo");
+    const elShuffleArea = document.getElementById("shuffleArea");
+    const elResult = document.getElementById("result");
+
+    document.getElementById("btnDraw").addEventListener("click", onDraw);
+    const btnUseSaved = document.getElementById("btnUseSaved");
+    if (btnUseSaved) btnUseSaved.addEventListener("click", useSaved);
+
+    const btnClearSaved = document.getElementById("btnClearSaved");
+    if (btnClearSaved) btnClearSaved.addEventListener("click", clearSaved);
+
+    if (elFile) elFile.addEventListener("change", onPickFile);
+
+    const CSV_PATH = "public/data/deck.csv";
+
+    function guessDelimiterFromText(text) {
+      const firstLine = (text || "").split(/\r?\n/)[0] || "";
+      const tabCount = (firstLine.match(/\t/g) || []).length;
+      const commaCount = (firstLine.match(/,/g) || []).length;
+      // タブの方が多ければTSV、それ以外はCSV
+      return tabCount > commaCount ? "\t" : ",";
+    }
+
+    async function loadBundledCsv() {
+      console.log("loadBundledCsv called");
+      setStatus("同梱CSVを読み込み中...");
+      console.log("CSV_PATH =", CSV_PATH);
+
+      try {
+        const res = await fetch(CSV_PATH, { cache: "no-store" });
+        if (!res.ok) throw new Error(`fetch failed: ${res.status} ${res.statusText}`);
+        const text = await res.text();
+
+        const delim = guessDelimiterFromText(text);
+        console.log("guessed delimiter =", JSON.stringify(delim));
+
+        const results = Papa.parse(text, {
+          header: true,
+          skipEmptyLines: true,
+          delimiter: delim
+        });
+
+
+        // ===== Column1〜 行を自動スキップする =====
+        if (results.meta?.fields?.[0]?.toLowerCase() === "column1") {
+          console.log("Dummy header detected. Re-parsing CSV...");
+          results.data.shift();              // ダミー行を捨てる
+        }
+        // ========================================
+
+        console.log("Papa meta.fields:", results.meta?.fields);
+        console.log("First row sample:", results.data?.[0]);
+
+        const rows = (results.data || [])
+          .map(normalizeRow)
+          .filter(r => r && r.id);
+
+
+        console.log("normalized rows:", rows.length, rows[0]);
+
+        if (!rows.length) {
+          setStatus("同梱CSVの読み込みはできたが、id が取れません（ヘッダー名/区切りの可能性）。");
+          return;
+        }
+
+        if (!validateCards(rows)) {
+          setStatus("同梱CSVの必須列（id,name_ja,name_en,image）が不足しています。");
+          return;
+        }
+
+        cards = rows;
+        setDeckInfo();
+        setStatus(`同梱CSV 読み込み完了：${cards.length}枚。引けます。`);
+        showReady();
+      } catch (e) {
+        console.error(e);
+        setStatus("同梱CSVの読み込みに失敗しました（Console参照）。");
+      }
+    }
+
+
+    function boot() {
+      applyCreatorMode();   // ← これを追加
+      loadBundledCsv(); // ★同梱CSVを自動で読む
+    }
+    boot();
+
+
+
+    function setStatus(msg) { elStatus.textContent = msg; }
+    function setDeckInfo() {
+      elDeckInfo.textContent = cards.length ? `デッキ：${cards.length}枚 読み込み済み` : "デッキ：未読み込み";
+    }
+
+
+    function pick(row, key) {
+      // 完全一致
+      if (row[key] != null) return row[key];
+
+      // trim/BOMを無視して一致させる
+      const want = normalizeKey(key);
+      const hit = Object.keys(row).find(k => normalizeKey(k) === want);
+      return hit ? row[hit] : "";
+    }
+
+    function normalizeKey(s) {
+      return (s ?? "")
+        .toString()
+        .replace(/^\uFEFF/, "")
+        .trim()
+        .toLowerCase();
+    }
+
+
+
+
+
+    function pickAny(row, candidates) {
+      for (const c of candidates) {
+        const v = pick(row, c);
+        if (v != null && String(v).trim() !== "") return String(v).trim();
+      }
+      return "";
+    }
+
+
+
+    function normalizeImagePath(s) {
+      return (s ?? "")
+        .toString()
+        .replace(/^\uFEFF/, "")
+        .trim()
+        .replace(/^\/+/, "")
+        .replace(/\\/g, "/");   // Windowsの \ を / に
+    }
+
+    function normalizeRow(row) {
+      // キー正規化（BOM/空白/大小）
+      const norm = (s) => (s ?? "").toString().replace(/^\uFEFF/, "").trim().toLowerCase();
+
+      // row から key を大小/BOM無視で取る
+      const get = (key) => {
+        const want = norm(key);
+        const hit = Object.keys(row).find(k => norm(k) === want);
+        return hit ? String(row[hit] ?? "").trim() : "";
+      };
+
+      // 1) 通常ヘッダー（id, arcana, ... image）で来た場合
+      const idNormal = get("id");
+      if (idNormal) {
+        // ヘッダー行が混じる保険
+        if (idNormal.toLowerCase() === "id") return null;
+
+        return {
+          id: idNormal,
+          arcana: get("arcana"),
+          suit: get("suit"),
+          number: get("number"),
+          name_ja: get("name_ja"),
+          name_en: get("name_en"),
+          element: get("element"),
+          polarity: get("polarity"),
+          yes_no_upright: get("yes_no_upright"),
+          yes_no_reversed: get("yes_no_reversed"),
+          timing: get("timing"),
+          themes: get("themes"),
+          keywords_upright: get("keywords_upright"),
+          keywords_reversed: get("keywords_reversed"),
+          core_upright: get("core_upright"),
+          interpretation_upright: get("interpretation_upright"),
+          angel_upright: get("angel_upright"),
+          action_upright: get("action_upright"),
+          core_reversed: get("core_reversed"),
+          interpretation_reversed: get("interpretation_reversed"),
+          angel_reversed: get("angel_reversed"),
+          action_reversed: get("action_reversed"),
+          image: normalizeImagePath(get("image")),
+        };
+      }
+
+      // Column形式は使わない
+      return null;
+    } // ← これが必要
+
+
+    function validateCards(list) {
+      // id さえあればOK（imageは無くても動く）
+      const bad = list.find(r => !r.id);
+      return !bad;
+    }
+
+
+
+    function onPickFile() {
+      const file = elFile.files?.[0];
+      if (!file) return;
+
+      setStatus("CSVを読み込み中...");
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const text = reader.result?.toString() || "";
+          const delim = guessDelimiterFromText(text);
+          console.log("file guessed delimiter =", JSON.stringify(delim));
+
+          const results = Papa.parse(text, {
+            header: true,
+            skipEmptyLines: true,
+            delimiter: delim
+          });
+
+
+
+          // ===== Column1〜 行を自動スキップする =====
+          if (results.meta?.fields?.[0]?.toLowerCase() === "column1") {
+            console.log("Dummy header detected. Re-parsing CSV...");
+            results.data.shift();
+          }
+          // ========================================
+
+
+
+
+          const rows = (results.data || [])
+            .map(normalizeRow)
+            .filter(r => r && r.id);
+
+
+          if (!rows.length) {
+            setStatus("CSVにデータがありません（区切り/ヘッダーを確認）。");
+            return;
+          }
+          if (!validateCards(rows)) {
+            setStatus("必須列（id,name_ja,name_en,image）が不足しています。");
+            return;
+          }
+
+          cards = rows;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+          setDeckInfo();
+          setStatus(`読み込み完了：${cards.length}枚。引けます。`);
+          showReady();
+        } catch (e) {
+          console.error(e);
+          setStatus("読み込みでエラー。CSV形式を確認してください。");
+        }
+      };
+      reader.onerror = () => {
+        setStatus("ファイルの読み込みに失敗しました。");
+      };
+      reader.readAsText(file, "utf-8");
+    }
+
+    function useSaved() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        setStatus("保存済みCSVがありません。まずCSVを読み込んでください。");
+        return;
+      }
+      try {
+        const rows = JSON.parse(saved);
+        if (!Array.isArray(rows) || !rows.length) {
+          setStatus("保存済みCSVが壊れています。いったん消して読み込み直してください。");
+          return;
+        }
+        cards = rows;
+        setDeckInfo();
+        setStatus(`保存済みCSVを読み込みました：${cards.length}枚。`);
+        showReady();
+      } catch (e) {
+        setStatus("保存済みCSVの読み込みに失敗。消して読み込み直してください。");
+      }
+    }
+
+    function clearSaved() {
+      localStorage.removeItem(STORAGE_KEY);
+      cards = [];
+      setDeckInfo();
+      setStatus("保存を削除しました。CSVを読み込んでください。");
+      elResult.innerHTML = `<div class="empty">
+    ここに結果が出ます。<br>
+    ① CSVを読み込む → ② 1枚/3枚を選ぶ → ③「カードを引く」
+  </div>`;
+    }
+
+
+    function getDrawCount() {
+      const el = document.querySelector('input[name="drawMode"]:checked');
+      return el ? parseInt(el.value, 10) : 1;
+    }
+
+    function showReady() {
+      elResult.innerHTML = `<div class="empty">
+        準備OK。<br>
+        ② 1枚/3枚を選ぶ → ③「カードを引く」
+      </div>`;
+    }
+
+    function startShuffle() { elShuffleArea.classList.add("shuffling"); }
+    function stopShuffle() { elShuffleArea.classList.remove("shuffling"); }
+    function randInt(n) { return Math.floor(Math.random() * n); }
+
+    function drawUnique(count) {
+      const used = new Set();
+      const picked = [];
+      while (picked.length < count) {
+        const idx = randInt(cards.length);
+        if (used.has(idx)) continue;
+        used.add(idx);
+        const card = cards[idx];
+        const isReversed = Math.random() < 0.5;
+        picked.push({ card, isReversed });
+      }
+      return picked;
+    }
+
+
+    async function onDraw() {
+      if (!cards.length) {
+        setStatus("先にCSVを読み込んでください。");
+        return;
+      }
+      const count = getDrawCount();
+      setStatus(`シャッフル中…（${count}枚引き）`);
+      startShuffle();
+      await new Promise(r => setTimeout(r, 1400));
+      stopShuffle();
+
+      const picked = drawUnique(count);
+      console.log("picked[0] raw =", picked[0]);
+      console.log("picked[0] json =", JSON.stringify(picked[0], null, 2));
+      console.log("picked[0].card json =", JSON.stringify(picked[0]?.card, null, 2));
+
+
+
+
+      const labels3 = ["過去", "現在", "未来"];
+      const gridClass = count === 1 ? "cardsGrid single" : "cardsGrid three";
+
+      // --- Global Summary & Energy Block (Spread-level) ---
+      let globalSummaryHTML = "";
+      if (picked.length > 0) {
+        const primaryCard = picked[0].card;
+        const isReversed = picked[0].isReversed;
+        const themes = (primaryCard.themes ?? "").toString().trim();
+        const action = (isReversed ? primaryCard.action_reversed : primaryCard.action_upright) || "";
+
+        const themeList = themes ? themes.split("|").flatMap(x => x.split(",")).map(t => t.trim()).filter(Boolean) : [];
+        let mainTheme = themeList.length > 0 ? themeList[0] : (primaryCard.name_ja || "未知");
+
+        const mood = isReversed ? "静かに" : "確かに";
+        const actionSub = action ? action.substring(0, 20) + "…" : "今できることを";
+
+        let reasonText = "";
+        let energyText = "";
+
+        if (typeof calculateLifePath === "function" && typeof getHonmeiStar === "function") {
+          const uDate = document.getElementById("userBirthdate")?.value;
+          const pDate = document.getElementById("partnerBirthdate")?.value;
+
+          if (uDate) {
+            const lp = calculateLifePath(uDate);
+            const [y, m, d] = uDate.split("-");
+            const honmei = getHonmeiStar(y, m, d);
+            const honmeiTheme = honmei && STAR_DATA[honmei] ? STAR_DATA[honmei].theme : "星の導き";
+            const honmeiName = honmei && STAR_DATA[honmei] ? STAR_DATA[honmei].name : "";
+            const lpDesc = NUMEROLOGY_DATA[lp] ? NUMEROLOGY_DATA[lp].lp : "";
+
+            reasonText = `数秘${lp}の魂と${honmeiTheme}が、あなたを支えているから。`;
+            energyText += `\n\n【あなたのエネルギー】\n・数秘：ライフパス${lp}${lpDesc ? `（${lpDesc}）` : ``}\n・九星：${honmeiName}${honmeiTheme ? `（${honmeiTheme}）` : ``}\n恋愛：ご自身の魅力と波長を大切に、相手の歩幅に寄せることで心休まる安らぎが訪れます。\n仕事：焦らずに今ある土台を深く根付かせることで、やがて星の光のように揺るぎない実績へと結実するでしょう。`;
+          } else {
+            reasonText = `カードに宿る「${mainTheme}」の力が、あなたを呼んでいるから。`;
+          }
+
+          if (pDate) {
+            const p_lp = calculateLifePath(pDate);
+            const [py, pm, pd] = pDate.split("-");
+            const p_star = getHonmeiStar(py, pm, pd);
+            const p_starName = STAR_DATA[p_star]?.name || "";
+            energyText += `\n\n【お相手のエネルギー】\n・数秘：ライフパス${p_lp}\n・九星：${p_starName}`;
+          }
+        } else {
+          reasonText = `カードに宿る「${mainTheme}」の力が、あなたを呼んでいるから。`;
+        }
+
+        const summaryConclusion = `【結論】${mood}、あなたの心は「${mainTheme}」へと向かっている。`;
+        const summaryReason = `【理由】${reasonText}`;
+        const summaryAction = `【一歩】${actionSub} あなたはもう十分、やってきた。`;
+
+        let safeEnergy = "";
+        if (energyText) {
+          safeEnergy = `<div class="summaryText" style="margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">${escapeHtml(energyText).replace(/\n/g, "<br>")}</div>`;
+        }
+
+        globalSummaryHTML = `
+      <div class="summaryCard line">
+        <div class="summaryTitle">${escapeHtml(summaryConclusion)}</div>
+        <div class="summaryText">${escapeHtml(summaryReason)}</div>
+        <div class="summaryText" style="font-weight: bold; color: rgba(255,255,255,.95);">${escapeHtml(summaryAction)}</div>
+        ${safeEnergy}
+      </div>
+    `;
+      }
+
+      elResult.innerHTML = `
+  ${globalSummaryHTML}
+  <div class="${gridClass}">
+    ${picked.map((p, i) =>
+        renderCard(p.card, p.isReversed, count === 3 ? labels3[i] : "ワンオラクル")
+      ).join("")}
+  </div>
+`;
+
+      setStatus(`結果表示：${count}枚引き。`);
+    }
+
+    // --- キーワード：| 区切りで最大10個 ---
+    function splitKeywords(str, limit = 10) {
+      const raw = (str ?? "").toString().trim();
+      if (!raw) return [];
+      return raw.split("|").map(s => s.trim()).filter(Boolean).slice(0, limit);
+    }
+    function strengthenCore(core, themes) {
+      const c = (core ?? "").toString().trim();
+
+      // 55文字以上なら、そのまま返す（完全ノータッチ）
+      if (c.length >= 55) return c;
+
+      const t = (themes ?? "").toString().trim();
+      const focus = t ? t.split("|")[0].trim() : "";
+
+      // 短いときだけ底上げ（最低40文字を狙う）
+      const base = c || "いまは流れの節目にいます。";
+      const focusLine = focus
+        ? `焦点：${focus}。`
+        : `焦点：いま大切な感覚に気づくこと。`;
+      const direction = `方向性：焦らず、できる一歩を選びましょう。`;
+
+      let out = `${base} ${focusLine} ${direction}`;
+
+      // 最低40文字の保険（短すぎるカード用）
+      if (out.length < 40) {
+        out += " 受け取った合図を大切に。";
+      }
+
+      return out;
+    }
+
+
+
+    function metaLine(card) {
+      const parts = [];
+      if (card.arcana) parts.push(`区分:${card.arcana}`);
+      if (card.suit) parts.push(`スート:${card.suit}`);
+      if (card.number) parts.push(`番号:${card.number}`);
+      if (card.element) parts.push(`元素:${card.element}`);
+      if (card.polarity) parts.push(`極性:${card.polarity}`);
+      if (card.timing) parts.push(`時期:${card.timing}`);
+      return parts.join(" / ");
+    }
+
+
+    // --- 4つのエネルギー分類テキスト生成 ---
+    function generateEnergyCategories(uDate, pDate) {
+      if (!uDate) return "";
+
+      const lp = calculateLifePath(uDate);
+      const [y, m, d] = uDate.split("-");
+      const honmei = getHonmeiStar(y, m, d) || 1;
+      const isLpOdd = lp % 2 !== 0;
+      const hElement = STAR_DATA[honmei] ? STAR_DATA[honmei].element : "水";
+
+      // 要件にある calculateNameNumbers の利用 (Name入力がないためプレースホルダで算出)
+      const nameEnergy = typeof calculateNameNumbers === "function" ? calculateNameNumbers("TAROT") : { su: 3, pe: 5 };
+      const hasStrongSoul = nameEnergy.su >= 5;
+
+      let romance = "【恋愛】";
+      if (pDate) {
+        const p_lp = calculateLifePath(pDate);
+        if (lp === p_lp || (isLpOdd && p_lp % 2 !== 0) || (!isLpOdd && p_lp % 2 === 0)) {
+          romance += "波長が合いやすい時期。お互いの長所を認め合うことで絆が深まります。";
+        } else {
+          romance += "違う視点を持つからこそ補い合える関係。違いを楽しむ心のゆとりが愛を育てます。";
+        }
+      } else {
+        romance += (hElement === "水" || hElement === "木" || hasStrongSoul)
+          ? "柔らかな気配りがご縁を引き寄せる時。自然なコミュニケーションが吉。"
+          : "あなたの情熱や芯の強さが魅力として伝わりやすい時期。素直な表現を心がけて。";
+      }
+
+      const work = " 【仕事】" + (["土", "金"].includes(hElement)
+        ? "堅実な積み上げが大きな成果に繋がります。焦らず着実な一歩を。"
+        : "直感やアイデアが光るタイミング。新しいアプローチを試してみる価値あり。");
+
+      const intp = " 【対人】" + (isLpOdd
+        ? "明るいエネルギーが周囲を牽引します。積極的な声かけが好循環を生むでしょう。"
+        : "聞き役に徹することで、深い信頼関係を築ける時期。相手の言葉に耳を傾けて。");
+
+      const money = " 【金運】" + ([8, 22].includes(lp) || hElement === "金"
+        ? "豊かさを引き寄せる力が強い時。自己投資や長期的な計画にお金を使うのがおすすめ。"
+        : "堅実な管理が金運安定の鍵。日々の小さな感謝が更なる豊かさを呼び込みます。");
+
+      return `\n${romance}${work}${intp}${money}`;
+    }
+
+    // 逆位置の時は逆位置だけ表示（正位置は表示しない）
+    function renderCard(card, isReversed, positionLabel) {
+
+      // --- データ取得 ---
+      const kw = splitKeywords(isReversed ? card.keywords_reversed : card.keywords_upright, 10);
+      const core = (isReversed ? card.core_reversed : card.core_upright) || "";
+      const interpretation = (isReversed ? card.interpretation_reversed : card.interpretation_upright) || "";
+      const angel = (isReversed ? card.angel_reversed : card.angel_upright) || "";
+      const action = (isReversed ? card.action_reversed : card.action_upright) || "";
+      const yn = (isReversed ? card.yes_no_reversed : card.yes_no_upright) || "";
+      const meta = metaLine(card);
+      const themes = (card.themes ?? "").toString().trim();
+
+      // --- 表示ブロック ---
+      const coreBlock = `
+    <div class="line">
+      <span class="k">要点：</span>
+     <div class="coreText">${escapeHtml(strengthenCore(core, themes))}</div>
+    </div>
+  `;
+
+      const interpretationBlock = `
+    <div class="line"><span class="k">読み解き：</span>${escapeHtml(interpretation)}</div>
+  `;
+
+      const angelBlock = `
+    <div class="line"><span class="k">天使からの言葉：</span>${escapeHtml(angel)}</div>
+  `;
+
+      const actionBlock = `
+    <div class="line"><span class="k">今日の一歩：</span>${escapeHtml(action)}</div>
+  `;
+
+      // --- 位置別出し分け ---
+      let mainMessageHTML = "";
+
+      if (positionLabel === "過去") {
+        mainMessageHTML = coreBlock;
+      } else if (positionLabel === "現在") {
+        mainMessageHTML = coreBlock + interpretationBlock;
+      } else if (positionLabel === "未来") {
+        mainMessageHTML = coreBlock + angelBlock + actionBlock;
+      } else {
+        // 1枚引き
+        mainMessageHTML = coreBlock + interpretationBlock + angelBlock + actionBlock;
+      }
+
+      // --- HTML返却 ---
+      return `
+    <div class="tcard">
+      <div class="tcardHeader">
+        <div class="tcardTitle">
+          <div class="pos">${escapeHtml(positionLabel)}</div>
+          <div class="name">${escapeHtml(card.name_ja)} <span class="sub">(${escapeHtml(card.name_en)})</span></div>
+          <div class="sub">${escapeHtml(meta)}</div>
+          ${themes ? `<div class="sub">テーマ：${escapeHtml(themes)}</div>` : ``}
+        </div>
+        <div class="badge ${isReversed ? "rev" : "up"}">${isReversed ? "逆位置" : "正位置"}</div>
+      </div>
+
+      <div class="tcardVisual">
+        <img class="cardImg ${isReversed ? "reversed" : ""}"
+          src="${cardImageUrl(card.image)}"
+          alt="${escapeHtml(card.name_ja)}"
+          onerror="handleCardImgError(this)"
+        />
+      </div>
+
+      ${yn ? `
+        <div class="ynRow">
+          <div class="yn ${isReversed ? "rev" : "up"}">YES / NO：${escapeHtml(yn)}</div>
+        </div>` : ``}
+
+      <div class="tcardBody">
+        <div class="line">
+          <span class="k">キーワード（${isReversed ? "逆" : "正"}）：</span>
+         <div class="kwWrap">
+  ${kw.length
+          ? kw.map(w => `<span class="kw ${isReversed ? "rev" : "up"}">${escapeHtml(w)}</span>`).join("")
+          : `<span class="small">（なし）</span>`
+        }
+</div>
+
+        </div>
+        ${mainMessageHTML}
+      </div>
+    </div>
+  `;
+    }
+
+    function cardImageUrl(image) {
+      let raw = (image ?? "").toString().trim();
+      if (!raw) return "public/cards/back.png";
+
+      raw = raw
+        .replace(/^\uFEFF/, "")
+        .replace(/^"+|"+$/g, "")
+        .replace(/^'+|'+$/g, "")
+        .replace(/^\/+/, "")
+        .replace(/\\/g, "/");
+
+      // 拡張子が無いなら png を付ける（webp 等は onerror 側で差し替え）
+      if (!/\.(png|jpg|jpeg|webp)$/i.test(raw)) {
+        raw += ".png";
+      }
+
+      // すでに絶対URLならそのまま
+      if (/^https?:\/\//i.test(raw)) return raw;
+
+      // raw が "wands/xxx.png" みたいに来る前提：必ず public/cards/ を付ける
+      return encodeURI("public/cards/" + raw);
+    }
+
+
+
+    function handleCardImgError(img) {
+      const tried = parseInt(img.dataset.tried || "0", 10);
+
+      // まず、元の src から「拡張子だけ」差し替えて試す
+      const src = img.getAttribute("src") || "";
+      const base = src.replace(/\.(webp|png|jpg|jpeg)(\?.*)?$/i, ""); // 末尾拡張子を除去
+      const query = (src.match(/(\?.*)$/) || [""])[0];
+
+      const exts = ["webp", "png", "jpg", "jpeg"];
+
+      // すでに back.png なら終了（無限ループ防止）
+      if (src.includes("back.png")) return;
+
+      if (tried < exts.length) {
+        img.dataset.tried = String(tried + 1);
+        img.src = `${base}.${exts[tried]}${query}`;
+        return;
+      }
+      console.warn("[MISSING IMAGE]", {
+        alt: img.alt,
+        lastTried: src,
+        base
+      });
+
+      // 最後の砦：裏面
+      img.src = "public/cards/back.png";
+    }
+
+
+    // ---- HTMLエスケープ ----
+    function escapeHtml(str) {
+      return (str ?? "").toString()
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+  </script>
+  <!-- <script src="numerology_logic_pure.js"></script> -->
+  <script src="assets/js/energy/energy_logic_clean.js"></script>
+</body>
+
+</html>
